@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport">
+    <title>日历插件demo</title>
+    <link rel="stylesheet" type="text/css" href="css.css">
+</head>
+<body>
+
+<div class="outerBox">
+    <div id="calendar">
+        <div class="titleBar">
+            <div class="title"></div>
+            <div class="backToToday">回今天</div>
+        </div>
+        <ul class="weekBar">
+            <li>SUN</li>
+            <li>MON</li>
+            <li>TUE</li>
+            <li>WED</li>
+            <li>THU</li>
+            <li>FRI</li>
+            <li>SAT</li>
+        </ul>
+        <div class="calendarPanel">
+            <div class="foldBox"></div>
+        </div>
+
+    </div>
+</div>
+
+<script type="text/javascript" src="js/calendar.js"></script>
+<script type="text/javascript">
+    var myCalendar = new Calendar('#calendar', {
+
+    });
+</script>
+</body>
+</html>
