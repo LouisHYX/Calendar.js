@@ -408,7 +408,7 @@ var Calendar = (function () {
                     }
 
                     //面板滑动距离超过自身高度1/2
-                    if (Math.abs(this.touchStartPos.pageY - this.touchEndPos.pageY) >= this.calendarPanel.offsetHeight / 2) {
+                    if (Math.abs(this.touchStartPos.pageY - this.touchEndPos.pageY) >= this.months[0].offsetHeight / 2) {
                         return true;
                     }
                     break;
@@ -517,7 +517,7 @@ var Calendar = (function () {
             this.panelHeight.unfold = this.months[0].offsetHeight + this.foldBox.offsetHeight;
 
             //根据盒子宽度设置每一天的间距
-            var _w = ((this.calendar.offsetWidth / 7) - this.weekNames[0].offsetWidth) / 2;
+            var _w = Math.floor(((this.calendar.offsetWidth / 7) - this.weekNames[0].offsetWidth) / 2);
             for (var d = 0; d < this.days.length; d++) {
                 this.days[d].style.margin = '12px ' + _w + 'px';
                 if (d < this.weekNames.length) {
