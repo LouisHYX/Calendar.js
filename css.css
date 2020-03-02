@@ -10,7 +10,7 @@ body{background: darkgray;padding: 100px 0;margin:0;}
 #calendar .weekBar{text-align: center;font-size: 0;}
 #calendar .weekBar > li{display: inline-block;width:32px;height:32px;line-height:32px;color:#888;font-size: 12px;box-sizing: border-box;margin: 12px 0;transition:all 0.3s ease;}
 #calendar .calendarPanel{position:relative;text-align: center;color:#333;height:368px;max-height:368px;min-height:88px;}
-/*#calendar .calendarPanel .week{display: inline-block;}*/
+/*#calendar .calendarPanel .week{float: left}*/
 #calendar .calendarPanel .month{position: absolute;left:0;right:0;width: 100%;}
 #calendar .calendarPanel .day{display: inline-block;width:32px;height:32px;line-height:32px;font-size:16px;box-sizing: border-box;margin: 12px 0;transition:all 0.3s ease;color:#bbb;}
 #calendar .calendarPanel .day.cur{color:#333;}

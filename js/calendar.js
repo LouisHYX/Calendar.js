@@ -49,7 +49,7 @@ var Calendar = (function () {
             {
                 event: 'transitionend', listener: this.calendarPanel, handler: function (e) {
                     e.stopPropagation();
-                    this.removeAnimation(this.calendarPanel);
+                    this.removeAnimation([this.calendarPanel, this.months[0], this.months[1], this.months[2]]);
                 }.bind(this)
             },
             {
@@ -285,17 +285,17 @@ var Calendar = (function () {
                 this.swapEle();
             }
             if (!this.slideLock) {
-                this.startAnimation(this.calendarPanel, 'height', 0.2);
+                this.startAnimation(this.months, 'left', 0.2);
                 this.slide();
                 this.slideLock = true;
             }
 
             //月份面板的展开收起
             if ((this.slideDir === 1 || this.slideDir === 2) && this.isSliding()) {
-                // this.startAnimation(this.calendarPanel, 'height', 0.2);
+                this.startAnimation(this.calendarPanel, 'height', 0.2);
                 this.foldOrUnfold();
             } else {
-                // this.startAnimation(this.calendarPanel, 'height', 0.2);
+                this.startAnimation(this.calendarPanel, 'height', 0.2);
                 this.posRebound();
             }
 
@@ -324,10 +324,16 @@ var Calendar = (function () {
             var _a = a || 'all',
                 _t = t.toString() || '0.3',
                 _c = c || 'ease';
+
             if (!ele) {
                 return false;
+            } else if (ele.length === undefined) {
+                ele = [ele];
             }
-            ele.style.transition = _a + ' ' + _t + 's' + ' ' + _c;
+
+            for (var i = 0; i < ele.length; i++) {
+                ele[i].style.transition = _a + ' ' + _t + 's' + ' ' + _c;
+            }
         },
 
         /**
@@ -336,8 +342,14 @@ var Calendar = (function () {
         removeAnimation: function (ele) {
             if (!ele) {
                 return false;
+            } else if (ele.length === undefined) {
+                ele = [ele];
             }
-            ele.style.removeProperty('transition');
+
+            for (var i = 0; i < ele.length; i++) {
+                ele[i].style.removeProperty('transition');
+
+            }
             this.slideLock = false;
         },
 
