@@ -313,8 +313,8 @@ var Calendar = (function () {
                 this.selectAllowed = true;
             }.bind(this), 10);
 
-            //选择当月1号
-            this.selectFirstDay();
+            //选择当月默认日期
+            this.selectDefaultDay();
         },
 
         /**
@@ -354,9 +354,9 @@ var Calendar = (function () {
         },
 
         /**
-         * 每次成功滑动月份面板则选择当月1号为默认选中
+         * 每次成功滑动月份面板则选择当月默认日期
          */
-        selectFirstDay: function () {
+        selectDefaultDay: function () {
             // for (var i = 0; i < this.monthsLeft.length; i++) {
             //     if (this.monthsLeft[i] === 0) {
             //         this.months[i] = 0;
