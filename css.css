@@ -1,15 +1,15 @@
 body{background: darkgray;padding: 100px 0;margin:0;}
 .outerBox{width:80%;box-sizing: border-box;margin: auto;}
 
-/*calendar*/
+/*日历*/
 #calendar{width: 100%; box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);background: white;border-radius: 4px;min-width:350px;/* height: 160px;*/ overflow: hidden;}
 #calendar ul{list-style: none;margin:0;padding:0;}
 #calendar .titleBar{position:relative;text-align: center; border-bottom: 1px solid #eeeeee;height: 54px;}
 #calendar .titleBar .title{color: #333; font-size: 20px;font-weight:bold;line-height: 54px;}
 #calendar .titleBar .backToToday{position:absolute;top:15px;right:30px;height:24px;color: #1ccda1; font-size: 14px;}
 #calendar .weekBar{text-align: center;font-size: 0;}
-#calendar .weekBar > li{display: inline-block;width:32px;height:32px;line-height:32px;color:#888;font-size: 12px;box-sizing: border-box;margin: 12px 0;transition:all 0.3s ease;}
-#calendar .calendarPanel{position:relative;overflow:hidden;text-align: center;color:#333;height:368px;max-height:368px;min-height:88px;}
+#calendar .weekBar > li{display: inline-block;width:32px;height:32px;line-height:32px;color:#999;font-size: 12px;box-sizing: border-box;margin: 12px 0;transition:all 0.3s ease;}
+#calendar .calendarPanel{position:relative;overflow:hidden;text-align: center;color:#333;height:88px;max-height:368px;min-height:88px;}
 #calendar .calendarPanel .month{position: absolute;left:0;right:0;width: 100%;}
 #calendar .calendarPanel .day{display: inline-block;width:32px;height:32px;line-height:32px;font-size:16px;box-sizing: border-box;margin: 12px 0;transition:all 0.3s ease;color:#bbb;}
 #calendar .calendarPanel .day.cur{color:#333;}
