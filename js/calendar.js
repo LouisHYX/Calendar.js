@@ -303,7 +303,7 @@ var Calendar = (function () {
                                     this.yearTemp = _year;
                                     this.monthTemp = _month;
                                 }
-                                this.dayTemp = 1
+                                this.dayTemp = 1;
 
                                 //如果在收起状态从这个月滑到下个月，则要排除在下个月中这个月的数据显示
                                 if (this.weekIndex === 4 && this.monthsLeft[a].days[this.weekIndex * 7 + 6].className.indexOf('oth') !== -1) {
@@ -644,6 +644,7 @@ var Calendar = (function () {
                 for (var w = 0; w < 6; w++) {
                     _li = document.createElement('li');
                     _li.classList.add('week');
+                    _li.setAttribute('data-row', w.toString());
                     for (var d = 0; d < 7; d++) {
                         _span = document.createElement('span');
                         _span.classList.add('day');
@@ -741,6 +742,10 @@ var Calendar = (function () {
 
             //更新月份面板在展开收起时的终值
             this.updateMonthTop();
+
+            //修改weekIndex值
+            this.weekIndex = parseInt(_curWeek.getAttribute('data-row'));
+            this.weekIndexTemp = this.weekIndex;
 
             //重写日期标题
             this.dayTemp = e.target.innerText;
