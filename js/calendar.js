@@ -93,6 +93,10 @@ var Calendar = (function () {
                     //点击后的日期选择状态
                     if (this.selectAllowed && e.target.className.indexOf('day') !== -1 && e.target.tagName === 'SPAN') {
                         this.selectDate(e);
+                    } else {
+                        this.yearTemp = this.year;
+                        this.monthTemp = this.month;
+                        this.dayTemp = this.day;
                     }
                 }.bind(this)
             },
@@ -120,8 +124,8 @@ var Calendar = (function () {
         this.weekIndexTemp = 0; //缓存日历收起时所展示的当月星期索引，若没有真正的滑动面板，则重新将原值赋给weekIndex
         this.weekIndexLock = false; //收起时月份切换所要改变的weekIndex因月份面板情况不同而不同
         this.weekIndexStep = 0; //收起时月份切换所要改变的weekIndex步长
-        this.dayIndex = 0;//设置选中的日期在该星期中的索引
-        this.dayIndexTemp = 0;//缓存选中的日期在days中的索引
+        // this.dayIndex = 0;//设置选中的日期在该星期中的索引
+        // this.dayIndexTemp = 0;//缓存选中的日期在days中的索引
         this.fold = true; //日历是否为收起状态
         this.monthsLeftOrigin = []; //存放三个月份面板的left值，该属性作为日历重置时的基本数据
         this.monthsLeft = []; //存放三个月份面板的left值，在滑动过程中刷新该数组，作为滑动后面板位置的终值
@@ -195,8 +199,6 @@ var Calendar = (function () {
                     this.curWeek = this.days1[i].parentNode;
                     this.weekIndex = Math.floor(i / 7);
                     this.weekIndexTemp = this.weekIndex;
-                    this.dayIndex = i;
-                    this.dayIndexTemp = this.dayIndex;
                     this.updateMonthTop();
                     break;
                 }
@@ -291,7 +293,6 @@ var Calendar = (function () {
                                 this.weekIndexTemp = this.weekIndex;
                                 this.weekIndex < 5 ? this.weekIndex++ : this.weekIndex = 0;
                                 this.months[a].style.top = this.monthsTop[this.weekIndex] + 'px'
-                                this.dayIndex < 35 ? this.dayIndex += 7 : this.dayIndex = 0;
                                 if (this.weekIndex === 0) {
                                     this.renderData(Utils.getMonthData(_nextYear, _nextMonth), this.monthsLeft[a].days);
                                     this.yearTemp = _nextYear;
@@ -312,7 +313,6 @@ var Calendar = (function () {
                                     this.weekIndexStep++;
                                 }
                                 if (!this.weekIndexLock && this.weekIndex === 0) {
-                                    this.dayIndex += this.weekIndexStep * 7;
                                     this.weekIndex += this.weekIndexStep;
                                     this.months[a].style.top = this.monthsTop[this.weekIndex] + 'px'
                                     this.weekIndexStep = 0;
@@ -334,7 +334,6 @@ var Calendar = (function () {
                                 this.weekIndexTemp = this.weekIndex;
                                 this.weekIndex > 0 ? this.weekIndex-- : this.weekIndex = 5;
                                 this.months[b].style.top = this.monthsTop[this.weekIndex] + 'px';
-                                this.dayIndex > 0 ? this.dayIndex -= 7 : this.dayIndex = 35;
                                 if (this.weekIndex === 5) {
                                     this.renderData(Utils.getMonthData(_lastYear, _lastMonth), this.monthsLeft[b].days);
                                     this.yearTemp = _lastYear;
@@ -363,7 +362,6 @@ var Calendar = (function () {
                                     this.weekIndexStep++;
                                 }
                                 if (!this.weekIndexLock && this.weekIndex === 5) {
-                                    this.dayIndex -= this.weekIndexStep * 7;
                                     this.weekIndex -= this.weekIndexStep;
                                     this.months[b].style.top = this.monthsTop[this.weekIndex] + 'px'
                                     this.weekIndexStep = 0;
@@ -437,13 +435,11 @@ var Calendar = (function () {
                 //选择当月默认日期
                 this.selectDefaultDay();
                 this.weekIndexTemp = this.weekIndex;
-                this.dayIndexTemp = this.dayIndex;
 
                 //重写标题日期
                 this.rewriteTitle(this.year, this.month, this.day);
             } else {
                 this.weekIndex = this.weekIndexTemp;
-                this.dayIndex = this.dayIndexTemp;
             }
             if (!this.slideLock) {
                 this.startAnimation(this.months, 'left', 0.2);
@@ -702,9 +698,9 @@ var Calendar = (function () {
             if (this.fold) {
                 for (var c = 0; c < this.monthsLeft.length; c++) {
                     if (this.monthsLeft[c].left === 0) {
-                        this.monthsLeft[c].days[this.dayIndex].classList.add('selected');
-                        this.monthsLeft[c].days[this.dayIndex].parentNode.classList.add('curWeek');
-                        this.curWeek = this.monthsLeft[c].days[this.dayIndex].parentNode;
+                        this.monthsLeft[c].days[this.weekIndex * 7].classList.add('selected');
+                        this.monthsLeft[c].days[this.weekIndex * 7].parentNode.classList.add('curWeek');
+                        this.curWeek = this.monthsLeft[c].days[this.weekIndex * 7].parentNode;
                     }
                 }
             } else {
@@ -747,22 +743,24 @@ var Calendar = (function () {
             this.updateMonthTop();
 
             //重写日期标题
-            this.getTempDate();
             this.dayTemp = e.target.innerText;
-            if (!this.fold) {
-                if (e.target.className.indexOf('cur') !== -1) {
-                    // this.yearTemp = this.month + 1 === 1 ? --this.year : this.year;
-                    // this.monthTemp = this.month + 1 === 1 ? 12 : --this.month;
-                    this.rewriteTitle(this.yearTemp, this.monthTemp, this.dayTemp);
-                } else if (e.target.className.indexOf('last') !== -1) {
-                    this.yearTemp = this.month + 1 === 1 ? --this.year : this.year;
-                    this.monthTemp = this.month + 1 === 1 ? 12 : --this.month;
-                    this.rewriteTitle(this.yearTemp, this.monthTemp - 1, this.dayTemp);
-                } else if (e.target.className.indexOf('next') !== -1) {
-                    this.rewriteTitle(this.yearTemp, this.monthTemp + 1, this.dayTemp);
-                }
-            } else {
+            if (e.target.className.indexOf('cur') !== -1) {
+                this.year = this.yearTemp;
+                this.month = this.monthTemp;
+                this.day = this.dayTemp;
+                this.rewriteTitle(this.year, this.month, this.day);
+            } else if (e.target.className.indexOf('last') !== -1) {
+                this.yearTemp = this.month + 1 === 1 ? this.year - 1 : this.year;
+                this.monthTemp = this.month + 1 === 1 ? 11 : this.month - 1;
                 this.rewriteTitle(this.yearTemp, this.monthTemp, this.dayTemp);
+                this.yearTemp = this.year;
+                this.monthTemp = this.month;
+            } else if (e.target.className.indexOf('next') !== -1) {
+                this.yearTemp = this.month + 1 === 12 ? this.year + 1 : this.year;
+                this.monthTemp = this.month + 1 === 12 ? 0 : this.month + 1;
+                this.rewriteTitle(this.yearTemp, this.monthTemp, this.dayTemp);
+                this.yearTemp = this.year;
+                this.monthTemp = this.month;
             }
         },
 
