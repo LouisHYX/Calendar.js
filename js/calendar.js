@@ -14,7 +14,7 @@ var Calendar = (function () {
                 afterSelect: null, //点击日期之后的回调
                 afterSlide: null, //横滑之后的回调
                 afterFold: null, //收起之后的回调
-                afterUnfold: null, //展开之后的回调
+                afterUnfold: null //展开之后的回调
             };
 
         //配置参数
