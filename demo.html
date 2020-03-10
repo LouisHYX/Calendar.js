@@ -7,32 +7,45 @@
     <link rel="stylesheet" type="text/css" href="css.css">
 </head>
 <body>
-
+<!--这个外盒子非必须，可以用来限制日历宽度-->
 <div class="outerBox">
+    <!--以下是日历主结构-->
     <div id="calendar">
         <div class="titleBar">
             <div class="title"></div>
             <div class="backToToday">回今天</div>
         </div>
         <ul class="weekBar">
-            <li>SUN</li>
-            <li>MON</li>
-            <li>TUE</li>
-            <li>WED</li>
-            <li>THU</li>
-            <li>FRI</li>
-            <li>SAT</li>
+            <li>日</li>
+            <li>一</li>
+            <li>二</li>
+            <li>三</li>
+            <li>四</li>
+            <li>五</li>
+            <li>六</li>
         </ul>
         <div class="calendarPanel">
             <div class="foldBox"></div>
         </div>
-
     </div>
 </div>
 
 <script type="text/javascript" src="js/calendar.js"></script>
 <script type="text/javascript">
-    var myCalendar = new Calendar('#calendar', {});
+    var myCalendar = new Calendar('#calendar'/*日历最外层盒子id*/, {
+        afterSelect: function () {
+            console.log('点击日期');
+        },
+        afterSlide: function () {
+            console.log('左右滑动');
+        },
+        afterFold: function () {
+            console.log('日历收起');
+        },
+        afterUnfold: function () {
+            console.log('日历展开');
+        },
+    });
 </script>
 </body>
 </html>

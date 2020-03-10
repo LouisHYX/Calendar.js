@@ -3,6 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="be04f9c3-e8fc-4468-a539-8da375f9f47a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/css.css" beforeDir="false" afterPath="$PROJECT_DIR$/css.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo.html" beforeDir="false" afterPath="$PROJECT_DIR$/demo.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/js/calendar.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/calendar.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -43,7 +45,7 @@
       <workItem from="1583131225289" duration="1265000" />
       <workItem from="1583491310044" duration="67510000" />
       <workItem from="1583752683805" duration="945000" />
-      <workItem from="1583758775750" duration="1871000" />
+      <workItem from="1583758775750" duration="19145000" />
     </task>
     <servers />
   </component>
@@ -59,10 +61,10 @@
       <screen x="0" y="23" width="2048" height="1060" />
     </state>
     <state x="533" y="192" key="SettingsEditor/0.23.2048.1060@0.23.2048.1060" timestamp="1583635186281" />
-    <state x="724" y="270" width="600" height="566" key="find.popup" timestamp="1583678941413">
+    <state x="724" y="270" width="600" height="566" key="find.popup" timestamp="1583814910278">
       <screen x="0" y="23" width="2048" height="1062" />
     </state>
-    <state x="724" y="270" width="600" height="566" key="find.popup/0.23.2048.1062@0.23.2048.1062" timestamp="1583678941413" />
+    <state x="724" y="270" width="600" height="566" key="find.popup/0.23.2048.1062@0.23.2048.1062" timestamp="1583814910278" />
     <state x="689" y="256" key="run.anything.popup" timestamp="1583229234242">
       <screen x="0" y="23" width="2048" height="1060" />
     </state>
