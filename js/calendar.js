@@ -390,6 +390,7 @@ var Calendar = (function () {
                 dy[i].classList.remove('next');
                 dy[i].classList.add(dt[i].class);
                 if (dt[i].today) {
+                    dy[i].classList.remove('foldStatus');
                     dy[i].classList.add('today');
                 } else {
                     dy[i].classList.remove('today');
@@ -418,9 +419,11 @@ var Calendar = (function () {
          */
         getTitleInfo: function () {
             var _ymd = this.title.innerText.split('-');
-            this.year = parseInt(_ymd[0]);
-            this.month = parseInt(_ymd[1]) - 1;
-            this.day = parseInt(_ymd[2]);
+            return {
+                year: parseInt(_ymd[0]),
+                month: parseInt(_ymd[1]),
+                day: parseInt(_ymd[2])
+            };
         },
 
         /**
@@ -448,7 +451,7 @@ var Calendar = (function () {
 
                 //横滑之后的回调
                 if (this.options.afterSlide) {
-                    this.options.afterSlide();
+                    this.options.afterSlide.bind(this)();
                 }
             }
 
@@ -551,6 +554,13 @@ var Calendar = (function () {
                     break;
                 case 1:
                 case 2:
+                    if (this.slideDir === 1 && this.calendarPanel.offsetHeight <= this.panelHeight.fold) {
+                        return;
+                    }
+                    if (this.slideDir === 2 && this.calendarPanel.offsetHeight >= this.panelHeight.unfold) {
+                        return;
+                    }
+
                     //手指滑动平均速度超过阈值V
                     if (Math.abs(this.touchStartPos.pageY - this.touchEndPos.pageY) / (this.touchEndTime - this.touchStartTime) >= this.v) {
                         return true;
@@ -592,14 +602,14 @@ var Calendar = (function () {
             switch (this.fold) {
                 case true:
                     this.calendarPanel.style.height = this.panelHeight.fold + 'px';
-                    this.foldBox.style.backgroundImage = 'url("img/arrow_downward.png")';
+                    this.foldBox.style.backgroundImage = 'url("images/arrow_downward.png")';
                     for (var i = 0; i < this.months.length; i++) {
                         this.months[i].style.top = this.monthTop.fold + 'px';
                     }
                     break;
                 case false:
                     this.calendarPanel.style.height = this.panelHeight.unfold + 'px';
-                    this.foldBox.style.backgroundImage = 'url("img/arrow_upward.png")';
+                    this.foldBox.style.backgroundImage = 'url("images/arrow_upward.png")';
                     for (var j = 0; j < this.months.length; j++) {
                         this.months[j].style.top = this.monthTop.unfold + 'px';
                     }
@@ -615,7 +625,7 @@ var Calendar = (function () {
                 case true:
                     if (this.slideDir === 2) {
                         this.calendarPanel.style.height = this.panelHeight.unfold + 'px';
-                        this.foldBox.style.backgroundImage = 'url("img/arrow_upward.png")';
+                        this.foldBox.style.backgroundImage = 'url("images/arrow_upward.png")';
                         for (var a = 0; a < this.months.length; a++) {
                             this.months[a].style.top = this.monthTop.unfold + 'px';
                         }
@@ -627,25 +637,27 @@ var Calendar = (function () {
 
                     //展开后的回调
                     if (this.options.afterUnfold) {
-                        this.options.afterUnfold();
+                        this.options.afterUnfold.bind(this)();
                     }
                     break;
                 case false:
                     if (this.slideDir === 1) {
                         this.calendarPanel.style.height = this.panelHeight.fold + 'px';
-                        this.foldBox.style.backgroundImage = 'url("img/arrow_downward.png")';
+                        this.foldBox.style.backgroundImage = 'url("images/arrow_downward.png")';
                         for (var c = 0; c < this.months.length; c++) {
                             this.months[c].style.top = this.monthTop.fold + 'px';
                         }
                         for (var d = 0; d < this.days.length; d++) {
-                            this.days[d].classList.add('foldStatus');
+                            if (this.days[d].className.indexOf('today') === -1) {
+                                this.days[d].classList.add('foldStatus');
+                            }
                         }
                         this.fold = true;
                     }
 
                     //收起后的回调
                     if (this.options.afterFold) {
-                        this.options.afterFold();
+                        this.options.afterFold.bind(this)();
                     }
                     break;
             }
@@ -810,7 +822,7 @@ var Calendar = (function () {
 
             //用户点击日期的回调
             if (this.options.afterSelect) {
-                this.options.afterSelect();
+                this.options.afterSelect.bind(this)();
             }
         },
 

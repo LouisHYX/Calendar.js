@@ -16,6 +16,6 @@ body{background: darkgray;padding: 100px 0;margin:0;}
 #calendar .calendarPanel .day.today{background:#e3f4f0;border-radius: 22px;color:#1ccda1; font-weight: bold;}
 #calendar .calendarPanel .day.foldStatus{color:#333;}
 #calendar .calendarPanel .day.selected{background:#1ccda1;border-radius: 22px;color:white; font-weight: bold;}
-#calendar .foldBox{position: absolute; bottom: 0; width: 100%; height: 24px; background: white url("img/arrow_upward.png") no-repeat center; background-size: 22px 8px;}
+#calendar .foldBox{position: absolute; bottom: 0; width: 100%; height: 24px; background: white url("images/arrow_downward.png") no-repeat center; background-size: 22px 8px;}
 
 
