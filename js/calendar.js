@@ -14,7 +14,8 @@ var Calendar = (function () {
                 afterSelect: null, //点击日期之后的回调
                 afterSlide: null, //横滑之后的回调
                 afterFold: null, //收起之后的回调
-                afterUnfold: null //展开之后的回调
+                afterUnfold: null, //展开之后的回调
+                afterReset: null //点击回今天按钮之后的回调
             };
 
         //配置参数
@@ -45,6 +46,9 @@ var Calendar = (function () {
             {
                 event: 'touchend', listener: this.backToToday, handler: function () {
                     this.reset();
+                    if (this.options.afterReset && this.options.afterReset instanceof Function) {
+                        this.options.afterReset();
+                    }
                 }.bind(this)
             },
             {
@@ -554,10 +558,10 @@ var Calendar = (function () {
                     break;
                 case 1:
                 case 2:
-                    if (this.slideDir === 1 && this.calendarPanel.offsetHeight <= this.panelHeight.fold) {
+                    if (this.slideDir === 1 && this.fold && this.calendarPanel.offsetHeight <= this.panelHeight.fold) {
                         return;
                     }
-                    if (this.slideDir === 2 && this.calendarPanel.offsetHeight >= this.panelHeight.unfold) {
+                    if (this.slideDir === 2 && !this.fold && this.calendarPanel.offsetHeight >= this.panelHeight.unfold) {
                         return;
                     }
 
