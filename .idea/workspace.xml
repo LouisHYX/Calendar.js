@@ -3,16 +3,20 @@
   <component name="ChangeListManager">
     <list default="true" id="be04f9c3-e8fc-4468-a539-8da375f9f47a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/css.css" beforeDir="false" afterPath="$PROJECT_DIR$/css.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/demo.html" beforeDir="false" afterPath="$PROJECT_DIR$/demo.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/arrow_downward.png" beforeDir="false" afterPath="$PROJECT_DIR$/images/arrow_downward.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/arrow_upward.png" beforeDir="false" afterPath="$PROJECT_DIR$/images/arrow_upward.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/js/calendar.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/calendar.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -23,6 +27,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
@@ -54,6 +59,11 @@
       <workItem from="1583890756249" duration="734000" />
       <workItem from="1583894700005" duration="108000" />
       <workItem from="1583896047642" duration="17000" />
+      <workItem from="1585890017710" duration="866000" />
+      <workItem from="1586223424998" duration="233000" />
+      <workItem from="1586223970599" duration="94000" />
+      <workItem from="1586224267189" duration="309000" />
+      <workItem from="1586349024176" duration="4592000" />
     </task>
     <servers />
   </component>
@@ -61,6 +71,10 @@
     <option name="version" value="2" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="762" y="308" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1586349041244">
+      <screen x="0" y="23" width="2048" height="1062" />
+    </state>
+    <state x="762" y="308" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.23.2048.1062@0.23.2048.1062" timestamp="1586349041244" />
     <state x="612" y="303" key="IDE.errors.dialog" timestamp="1583547913660">
       <screen x="0" y="23" width="2048" height="1060" />
     </state>
