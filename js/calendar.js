@@ -52,6 +52,19 @@ var Calendar = (function () {
                 }.bind(this)
             },
             {
+                event: 'touchend', listener: this.foldBox, handler: function (e) {
+                    e.stopPropagation();
+
+                    //如果手指没有滑动，则默认为点击事件，执行点击后展开或者收起日历
+                    if (this.touchMovePos === this.touchStartPos) {
+                        this.clickFoldOrUnfold();
+                    }
+
+                    this.resetTouchData(e);
+                    this.afterTouch();
+                }.bind(this)
+            },
+            {
                 event: 'transitionend', listener: this.calendarPanel, handler: function (e) {
                     e.stopPropagation();
                     this.removeAnimation([this.calendarPanel, this.months[0], this.months[1], this.months[2]]);
@@ -88,9 +101,7 @@ var Calendar = (function () {
                 event: 'touchend', listener: this.calendarPanel, handler: function (e) {
                     e.stopPropagation();
 
-                    this.touchEndPos = e.changedTouches[0];
-                    this.touchMovePos = null;
-                    this.touchEndTime = new Date().getTime();
+                    this.resetTouchData(e);
                     this.afterTouch();
 
                     //点击后的日期选择状态
@@ -190,6 +201,15 @@ var Calendar = (function () {
             if (this.fold) {
                 this.months[1].style.top = -this.curWeek.offsetTop + 'px';
             }
+        },
+
+        /**
+         * 重置触摸数据
+         */
+        resetTouchData: function (e) {
+            this.touchEndPos = e.changedTouches[0];
+            this.touchMovePos = null;
+            this.touchEndTime = new Date().getTime();
         },
 
         /**
@@ -460,11 +480,11 @@ var Calendar = (function () {
             }
 
             //月份面板的展开收起
-            if ((this.slideDir === 1 || this.slideDir === 2)) {
+            if (this.slideDir === 1 || this.slideDir === 2) {
                 this.startAnimation(this.calendarPanel, 'height', 0.2);
                 this.startAnimation(this.months, 'top', 0.2);
                 if (this.isSliding()) {
-                    this.foldOrUnfold();
+                    this.slideFoldOrUnfold();
                 } else {
                     this.posRebound();
                 }
@@ -622,48 +642,78 @@ var Calendar = (function () {
         },
 
         /**
-         * 实现日期面板展开或收起
+         * 具体实现收起的函数
          */
-        foldOrUnfold: function () {
-            switch (this.fold) {
-                case true:
-                    if (this.slideDir === 2) {
-                        this.calendarPanel.style.height = this.panelHeight.unfold + 'px';
-                        this.foldBox.style.backgroundImage = 'url("images/arrow_upward.png")';
-                        for (var a = 0; a < this.months.length; a++) {
-                            this.months[a].style.top = this.monthTop.unfold + 'px';
-                        }
-                        for (var b = 0; b < this.days.length; b++) {
-                            this.days[b].classList.remove('foldStatus');
-                        }
-                        this.fold = false;
-                    }
+        foldCalendar: function () {
+            this.calendarPanel.style.height = this.panelHeight.unfold + 'px';
+            this.foldBox.style.backgroundImage = 'url("images/arrow_upward.png")';
+            for (var a = 0; a < this.months.length; a++) {
+                this.months[a].style.top = this.monthTop.unfold + 'px';
+            }
+            for (var b = 0; b < this.days.length; b++) {
+                this.days[b].classList.remove('foldStatus');
+            }
+            this.fold = false;
+        },
 
-                    //展开后的回调
-                    if (this.options.afterUnfold) {
-                        this.options.afterUnfold.bind(this)();
-                    }
-                    break;
-                case false:
-                    if (this.slideDir === 1) {
-                        this.calendarPanel.style.height = this.panelHeight.fold + 'px';
-                        this.foldBox.style.backgroundImage = 'url("images/arrow_downward.png")';
-                        for (var c = 0; c < this.months.length; c++) {
-                            this.months[c].style.top = this.monthTop.fold + 'px';
-                        }
-                        for (var d = 0; d < this.days.length; d++) {
-                            if (this.days[d].className.indexOf('today') === -1) {
-                                this.days[d].classList.add('foldStatus');
-                            }
-                        }
-                        this.fold = true;
-                    }
+        /**
+         * 具体实现展开的函数
+         */
+        unfoldCalendar: function () {
+            this.calendarPanel.style.height = this.panelHeight.fold + 'px';
+            this.foldBox.style.backgroundImage = 'url("images/arrow_downward.png")';
+            for (var c = 0; c < this.months.length; c++) {
+                this.months[c].style.top = this.monthTop.fold + 'px';
+            }
+            for (var d = 0; d < this.days.length; d++) {
+                if (this.days[d].className.indexOf('today') === -1) {
+                    this.days[d].classList.add('foldStatus');
+                }
+            }
+            this.fold = true;
+        },
 
-                    //收起后的回调
-                    if (this.options.afterFold) {
-                        this.options.afterFold.bind(this)();
-                    }
-                    break;
+        /**
+         * 实现日期面板点击按钮后的展开或收起
+         */
+        clickFoldOrUnfold: function () {
+            this.startAnimation(this.calendarPanel, 'height', 0.2);
+            this.startAnimation(this.months, 'top', 0.2);
+            if (this.fold) {
+                this.foldCalendar();
+            } else {
+                this.unfoldCalendar();
+            }
+
+            this.foldOrUnfoldCallback();
+        },
+
+        /**
+         * 实现日期面板手指滑动时的展开或收起
+         */
+        slideFoldOrUnfold: function () {
+            if (this.fold) {
+                if (this.slideDir === 2) {
+                    this.foldCalendar();
+                }
+            } else {
+                if (this.slideDir === 1) {
+                    this.unfoldCalendar();
+                }
+            }
+
+            this.foldOrUnfoldCallback();
+        },
+
+        foldOrUnfoldCallback: function () {
+            if (this.fold) {
+                if (this.options.afterFold) {
+                    this.options.afterFold.bind(this)();
+                }
+            } else {
+                if (this.options.afterUnfold) {
+                    this.options.afterUnfold.bind(this)();
+                }
             }
         },
 
@@ -887,15 +937,6 @@ var Calendar = (function () {
                     item.listener.addEventListener(item.event, item.handler);
                 }
             }.bind(this));
-        },
-
-        /**
-         * 实现用户可在外部自行注册事件
-         */
-        registerEvent: function (e, l, h) {
-            this.events.push({
-                event: e, listener: l, handler: h.bind(this)
-            });
         }
     };
 
