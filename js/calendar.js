@@ -15,7 +15,8 @@ var Calendar = (function () {
                 afterSlide: null, //横滑之后的回调
                 afterFold: null, //收起之后的回调
                 afterUnfold: null, //展开之后的回调
-                afterReset: null //点击回今天按钮之后的回调
+                afterReset: null, //点击回今天按钮之后的回调
+                redDot: null //是否生成日历红点标记
             };
 
         //配置参数
@@ -35,6 +36,7 @@ var Calendar = (function () {
         this.days1 = this.months[1].querySelectorAll(_el + ' .day');
         this.days2 = this.months[2].querySelectorAll(_el + ' .day');
         this.foldBox = this.calendarPanel.querySelector(_el + ' .foldBox');
+        this.redDotBox = this.options.redDot ? this.createRedDotBox() : null;
 
         //事件
         this.events = [ //所有事件存放于该数组，等待程序逐一绑定
@@ -68,6 +70,14 @@ var Calendar = (function () {
                 event: 'transitionend', listener: this.calendarPanel, handler: function (e) {
                     e.stopPropagation();
                     this.removeAnimation([this.calendarPanel, this.months[0], this.months[1], this.months[2]]);
+
+                    //横滑之后的操作
+                    if (!this.afterSlideLock) {
+
+                        //生成红点标记
+                        this.renderRedDot(this.options.redDot);
+                        this.afterSlideLock = true;
+                    }
                 }.bind(this)
             },
             {
@@ -134,11 +144,8 @@ var Calendar = (function () {
         this.monthTemp = null; //临时存储（避免月份面板没有产生切换时标题会更改的问题，只有确认切换后才将该值传给this.month）
         this.dayTemp = null; //临时存储（避免月份面板没有产生切换时标题会更改的问题，只有确认切换后才将该值传给this.day）
         this.weekIndex = 0; //设置日历收起时所展示的当月星期在月份面板中的索引
-        this.weekIndexTemp = 0; //缓存日历收起时所展示的当月星期索引，若没有真正的滑动面板，则重新将原值赋给weekIndex
-        this.weekIndexLock = false; //收起时月份切换所要改变的weekIndex因月份面板情况不同而不同
-        this.weekIndexStep = 0; //收起时月份切换所要改变的weekIndex步长
-        this.curMonthFirstDay = 0; //当前月份面板[0, 0]位置的日期
-        this.curMonthLastDay = 0; //当前月份面板[6, 5]位置的日期
+        this.curMonthFirstDay = null; //当前月份面板坐标(0, 0)位置的日期
+        this.curMonthLastDay = null; //当前月份面板坐标(6, 5)位置的日期
         this.fold = true; //日历是否为收起状态
         this.monthsLeftOrigin = []; //存放三个月份面板的left值，该属性作为日历重置时的基本数据
         this.monthsLeft = []; //存放三个月份面板的left值，在滑动过程中刷新该数组，作为滑动后面板位置的终值
@@ -147,6 +154,7 @@ var Calendar = (function () {
         this.monthTop = {fold: null, unfold: 0}; //存放月份面板的top值，作为展开收起后月份面板的top终值
         this.getData = true; //是否允许从Utils对象中获取日历数据
         this.curWeek = null; //存放当前被选中的日期所在行
+        this.afterSlideLock = true; //横滑动画锁
 
         //初始化
         this.init();
@@ -224,7 +232,6 @@ var Calendar = (function () {
                     this.days1[i].parentNode.classList.add('curWeek');
                     this.curWeek = this.days1[i].parentNode;
                     this.weekIndex = Math.floor(i / 7);
-                    this.weekIndexTemp = this.weekIndex;
                     this.updateMonthTop();
                     break;
                 }
@@ -450,22 +457,21 @@ var Calendar = (function () {
 
                 //选择当月默认日期
                 this.selectDefaultDay();
-                this.weekIndexTemp = this.weekIndex;
 
                 //重写标题日期
-                console.log(this.month);
-                this.rewriteTitle(this.year, this.month, this.day);
-            } else {
-                this.weekIndex = this.weekIndexTemp;
-            }
-            if (this.slideDir === 3 || this.slideDir === 4) {
-                this.startAnimation(this.months, 'left', 0.2);
-                this.slide();
+                this.rewriteTitle(this.year, this.monthTemp, this.day);
+
+                //重置月份面板横向滑动锁
+                this.afterSlideLock = false;
 
                 //横滑之后的回调
                 if (this.options.afterSlide) {
                     this.options.afterSlide.bind(this)();
                 }
+            }
+            if (this.slideDir === 3 || this.slideDir === 4) {
+                this.startAnimation(this.months, 'left', 0.2);
+                this.slide();
             }
 
             //月份面板的展开收起
@@ -766,6 +772,9 @@ var Calendar = (function () {
                     this.weekNames[d].style.margin = '0 ' + _w + 'px';
                 }
             }
+
+            //生成红点标记
+            this.renderRedDot(this.options.redDot);
         },
 
         /**
@@ -788,10 +797,22 @@ var Calendar = (function () {
                         _selectedDay.parentNode.classList.add('curWeek');
                         this.curWeek = _selectedDay.parentNode;
                         this.day = this.dayTemp = this.monthsLeft[c].days[this.weekIndex * 7].innerText;
+
+                        //在日历收起状态，则需要统一所有日期的显示样式（不区分上月，本月，下月）
                         for (var d = 0; d < this.monthsLeft[c].days.length; d++) {
                             if (this.monthsLeft[c].days[d].className.indexOf('cur') === -1) {
                                 this.monthsLeft[c].days[d].classList.add('foldStatus');
                             }
+                        }
+
+                        //如果默认选择为上个月的日期，则当前标题月份显示需要-1
+                        if (_selectedDay.className.indexOf('last') !== -1) {
+                            this.monthTemp--;
+                        }
+
+                        //如果默认选择为下个月的日期，则当前标题月份显示需要+1
+                        if (_selectedDay.className.indexOf('next') !== -1) {
+                            this.monthTemp++;
                         }
                     }
                 }
@@ -835,15 +856,8 @@ var Calendar = (function () {
             //更新月份面板在展开收起时的终值
             this.updateMonthTop();
 
-            //修改weekIndex和weekIndexStep的值
+            //修改weekIndex的值
             this.weekIndex = parseInt(_curWeek.getAttribute('data-row'));
-            if (this.weekIndex === 5 && _curWeek.childNodes[_curWeek.childNodes.length - 1].className.indexOf('next') !== -1) {
-                if (_curWeek.previousElementSibling.childNodes[_curWeek.childNodes.length - 1].className.indexOf('next') !== -1) {
-                    this.weekIndexStep++;
-                }
-                this.weekIndexStep++;
-            }
-            this.weekIndexTemp = this.weekIndex;
 
             //重写日期标题
             this.dayTemp = e.target.innerText;
@@ -914,6 +928,40 @@ var Calendar = (function () {
          */
         updateMonthTop: function () {
             this.monthTop.fold = -this.curWeek.offsetTop === 0 ? 0 : -this.curWeek.offsetTop;
+        },
+
+        /**
+         * 在有计划的日期上添加红点标记
+         */
+        renderRedDot: function (planArr) {
+            var _pa = planArr || [];
+
+            //如果不存在红点最外层盒子则返回
+            if(!this.redDotBox){
+                return;
+            }
+
+            this.createRedDot();
+
+        },
+
+        /**
+         * 创建红点
+         */
+        createRedDot: function () {
+            var _redDot = null,
+                _span = document.createElement('span');
+            _span.className = 'redDot';
+            return _redDot;
+        },
+
+        /**
+         * 创建所有红点最外层盒子
+         */
+        createRedDotBox: function () {
+            var _div = document.createElement('div');
+            _div.className = 'redDotBox';
+            return this.calendar.appendChild(_div);
         },
 
         /**
@@ -989,17 +1037,10 @@ var Calendar = (function () {
         };
 
         /**
-         * 判断是否是闰年
+         * 判断是否为闰年
          */
         _utils.isLeapYear = function (year) {
             return (year % 400 === 0) || (year % 100 !== 0 && year % 4 === 0);
-        };
-
-        /**
-         * 红点生成器
-         */
-        _utils.createRedDot = function (planArr) {
-            var _pa = planArr || [];
         };
 
         /**
@@ -1010,7 +1051,7 @@ var Calendar = (function () {
         };
 
         /**
-         * 合并参数
+         * 将用户配置参数与默认参数合并
          */
         _utils.comParams = function (cus, def) {
             var res = {};  //需要返回的结果
