@@ -1017,7 +1017,7 @@ var Calendar = (function () {
         /**
          * 修改后台红点数据
          */
-        removeUnnecessary: function (arr) {
+        dataSimplification: function (arr) {
             var _arr = arr || [],
                 _res = [];
             for (var i = 0; i < _arr.length; i++) {
@@ -1042,7 +1042,7 @@ var Calendar = (function () {
             }
 
             //将数组中的年份和月份去除
-            arr = this.removeUnnecessary(arr);
+            arr = this.dataSimplification(arr);
 
             //渲染红点
             this.renderAllRedDots(arr, days);
