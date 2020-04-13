@@ -1041,7 +1041,7 @@ var Calendar = (function () {
                 return;
             }
 
-            //将红点标记数组中的年份和月份去除
+            //将数组中的年份和月份去除
             arr = this.removeUnnecessary(arr);
 
             //渲染红点
