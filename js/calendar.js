@@ -11,6 +11,7 @@ var Calendar = (function () {
     function Calendar(el, options) {
         var _el = el || '#calendar', //calendar最外层盒子id
             _options = { //默认配置参数
+                afterInit: null, //初始化完成之后的回调
                 afterSelect: null, //点击日期之后的回调
                 afterSlideToLast: null, //滑到上个月之后的回调
                 afterSlideToNext: null, //滑到下个月之后的回调
@@ -22,7 +23,7 @@ var Calendar = (function () {
 
         //配置参数
         this.options = Utils.comParams(options || {}, _options);
-        // this.redDotArr = null; //指向后台读取的红点标记数组
+        this.redDotArr = null; //指向后台读取的红点标记数组
 
         //DOM节点
         this.calendar = document.querySelector(_el);
@@ -181,6 +182,7 @@ var Calendar = (function () {
                 this.layout();
                 this.setData();
                 this.bindEvent();
+                this.afterInitCallBack();
             } catch (e) {
                 if (e instanceof Error) {
                     console.error(e.name + ', ' + e.message + ', ' + e.stack);
@@ -188,6 +190,18 @@ var Calendar = (function () {
                     console.error('未知错误：' + e);
                 }
             }
+        },
+
+        /**
+         * 日历初始化完成后的回调
+         */
+        afterInitCallBack: function () {
+            if (this.options.afterInit && this.options.afterInit instanceof Function) {
+                this.redDotArr = this.options.afterInit.bind(this)().redDotArr;
+            }
+
+            //生成红点标记
+            this.renderRedDot(this.redDotArr, this.curDays);
         },
 
         /**
@@ -673,6 +687,8 @@ var Calendar = (function () {
                     }
                     break;
             }
+
+            //防止怪异滑动行为造成的面板偏移，因此进行一次横向归位操作
             this.slide();
         },
 
@@ -739,13 +755,16 @@ var Calendar = (function () {
             this.foldOrUnfoldCallback();
         },
 
+        /**
+         * 实现日期面板展开或收起时的回调
+         */
         foldOrUnfoldCallback: function () {
             if (this.fold) {
-                if (this.options.afterFold) {
+                if (this.options.afterFold && this.options.afterFold instanceof Function) {
                     this.options.afterFold.bind(this)();
                 }
             } else {
-                if (this.options.afterUnfold) {
+                if (this.options.afterUnfold && this.options.afterUnfold instanceof Function) {
                     this.options.afterUnfold.bind(this)();
                 }
             }
@@ -815,9 +834,6 @@ var Calendar = (function () {
                     this.weekNames[d].style.margin = '0 ' + _w + 'px';
                 }
             }
-
-            //生成红点标记
-            this.renderRedDot(this.options.redDot);
         },
 
         /**
@@ -926,7 +942,7 @@ var Calendar = (function () {
             }
 
             //用户点击日期的回调
-            if (this.options.afterSelect) {
+            if (this.options.afterSelect && this.options.afterSelect instanceof Function) {
                 this.options.afterSelect.bind(this)();
             }
         },
@@ -982,20 +998,17 @@ var Calendar = (function () {
             var _redDotArr = null;
 
             //滑到上个月之后的回调
-            if (this.options.afterSlideToLast && this.slideDir === 4) {
+            if (this.options.afterSlideToLast && this.slideDir === 4 && this.options.afterSlideToLast instanceof Function) {
                 _redDotArr = this.options.afterSlideToLast.bind(this)().redDotArr || [];
             }
 
             //滑到下个月之后的回调
-            // if (this.options.afterSlideToNext && this.slideDir === 3) {
+            // if (this.options.afterSlideToNext && this.slideDir === 3 && this.options.afterSlideToNext instanceof Function) {
             //     _redDotArr = this.options.afterSlideToNext.bind(this)().redDotArr || [];
             // }
 
-            //将红点标记数组中的年份和月份去除
-            _redDotArr = this.removeUnnecessary(_redDotArr, this.curDays);
-
             //在日历上渲染红点标记
-            this.renderRedDot(_redDotArr);
+            this.renderRedDot(_redDotArr, this.curDays);
 
             //重置滑动方向
             this.slideDir = 0;
@@ -1016,25 +1029,51 @@ var Calendar = (function () {
         /**
          * 在有计划的日期上添加红点标记
          */
-        renderRedDot: function (planArr) {
-            var _pa = planArr || [];
+        renderRedDot: function (arr, days) {
+
+            //如果参数不满足要求则返回
+            if ((!arr || !days) || (arr.length === 0 || days.length === 0)) {
+                return;
+            }
 
             //如果不存在红点最外层盒子则返回
             if (!this.redDotBox) {
                 return;
             }
 
-            this.createRedDot();
+            //将红点标记数组中的年份和月份去除
+            arr = this.removeUnnecessary(arr);
+
+            //渲染红点
+            this.renderAllRedDots(arr, days);
+        },
+
+        /**
+         * 渲染所需的红点标记
+         */
+        renderAllRedDots: function (arr, days) {
+            var _dots = this.createRedDot(arr.length),
+                _ds = days;
 
         },
 
         /**
          * 创建红点
          */
-        createRedDot: function () {
-            var _redDot = null,
+        createRedDot: function (l) {
+            var _fragment = document.createDocumentFragment(),
+                _redDot = [],
+                _span = null;
+
+            for (var i = 0; i < l; i++) {
                 _span = document.createElement('span');
-            _span.className = 'redDot';
+                _span.className = 'redDot';
+                _fragment.appendChild(_span);
+                _redDot.push(_span);
+            }
+
+            this.redDotBox.appendChild(_fragment);
+
             return _redDot;
         },
 
@@ -1044,7 +1083,7 @@ var Calendar = (function () {
         createRedDotBox: function () {
             var _div = document.createElement('div');
             _div.className = 'redDotBox';
-            return this.calendar.appendChild(_div);
+            return this.calendar.insertBefore(_div, this.calendar.childNodes[0]);
         },
 
         /**
