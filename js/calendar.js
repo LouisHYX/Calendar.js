@@ -12,15 +12,17 @@ var Calendar = (function () {
         var _el = el || '#calendar', //calendar最外层盒子id
             _options = { //默认配置参数
                 afterSelect: null, //点击日期之后的回调
-                afterSlide: null, //横滑之后的回调
+                afterSlideToLast: null, //滑到上个月之后的回调
+                afterSlideToNext: null, //滑到下个月之后的回调
                 afterFold: null, //收起之后的回调
                 afterUnfold: null, //展开之后的回调
                 afterReset: null, //点击回今天按钮之后的回调
-                redDot: null //是否生成日历红点标记
+                redDot: false //是否生成日历红点标记
             };
 
         //配置参数
         this.options = Utils.comParams(options || {}, _options);
+        // this.redDotArr = null; //指向后台读取的红点标记数组
 
         //DOM节点
         this.calendar = document.querySelector(_el);
@@ -69,13 +71,20 @@ var Calendar = (function () {
             {
                 event: 'transitionend', listener: this.calendarPanel, handler: function (e) {
                     e.stopPropagation();
+
+                    //去除月份面板在滑动时动态添加的动画属性
                     this.removeAnimation([this.calendarPanel, this.months[0], this.months[1], this.months[2]]);
 
                     //横滑之后的操作
                     if (!this.afterSlideLock) {
 
+                        //面板左右滑动动画结束之后的操作
+                        this.afterSlide();
+
                         //生成红点标记
                         this.renderRedDot(this.options.redDot);
+
+                        //重置面板横向滑动动画锁
                         this.afterSlideLock = true;
                     }
                 }.bind(this)
@@ -144,9 +153,11 @@ var Calendar = (function () {
         this.monthTemp = null; //临时存储（避免月份面板没有产生切换时标题会更改的问题，只有确认切换后才将该值传给this.month）
         this.dayTemp = null; //临时存储（避免月份面板没有产生切换时标题会更改的问题，只有确认切换后才将该值传给this.day）
         this.weekIndex = 0; //设置日历收起时所展示的当月星期在月份面板中的索引
+        this.weekIndexTemp = 0; //缓存日历收起时所展示的当月星期索引，若没有真正的滑动面板，则重新将原值赋给weekIndex
         this.curMonthFirstDay = null; //当前月份面板坐标(0, 0)位置的日期
         this.curMonthLastDay = null; //当前月份面板坐标(6, 5)位置的日期
         this.fold = true; //日历是否为收起状态
+        this.curDays = null; //存放当月所有日期
         this.monthsLeftOrigin = []; //存放三个月份面板的left值，该属性作为日历重置时的基本数据
         this.monthsLeft = []; //存放三个月份面板的left值，在滑动过程中刷新该数组，作为滑动后面板位置的终值
         this.monthsTop = []; //存放三个月份面板的Top值，作为日历收起时月份面板Top位置的初始值
@@ -208,6 +219,9 @@ var Calendar = (function () {
             //设置今天
             this.setTody(_day);
 
+            //设置当前月份日期
+            this.curDays = this.monthsLeft[1].days;
+
             if (this.fold) {
                 this.months[1].style.top = -this.curWeek.offsetTop + 'px';
             }
@@ -232,6 +246,7 @@ var Calendar = (function () {
                     this.days1[i].parentNode.classList.add('curWeek');
                     this.curWeek = this.days1[i].parentNode;
                     this.weekIndex = Math.floor(i / 7);
+                    this.weekIndexTemp = this.weekIndex;
                     this.updateMonthTop();
                     break;
                 }
@@ -341,9 +356,7 @@ var Calendar = (function () {
                                     this.renderData(Utils.getMonthData(_year, _month), this.monthsLeft[a].days);
                                     this.yearTemp = _year;
                                     this.monthTemp = _month;
-                                    if (!this.curMonthFirstDay) {
-                                        this.curMonthLastDay = this.monthsLeft[a].days[this.monthsLeft[a].days.length - 1].innerText;
-                                    }
+                                    this.getCurMonthLastDay(this.monthsLeft[a].days);
                                 }
                                 this.dayTemp = 1;
                                 this.months[a].style.top = this.monthsTop[this.weekIndex] + 'px'
@@ -379,9 +392,7 @@ var Calendar = (function () {
                                     this.renderData(Utils.getMonthData(_year, _month), this.monthsLeft[b].days);
                                     this.yearTemp = _year;
                                     this.monthTemp = _month;
-                                    if (!this.curMonthFirstDay) {
-                                        this.curMonthFirstDay = this.monthsLeft[b].days[0].innerText;
-                                    }
+                                    this.getCurMonthFirstDay(this.monthsLeft[b].days);
                                 }
                                 this.dayTemp = 1;
                                 this.months[b].style.top = this.monthsTop[this.weekIndex] + 'px';
@@ -395,6 +406,24 @@ var Calendar = (function () {
                         }
                     }
                     break;
+            }
+        },
+
+        /**
+         * 获取当月坐标（0,0）位置的日期
+         */
+        getCurMonthFirstDay: function (days) {
+            if (!this.curMonthFirstDay) {
+                this.curMonthFirstDay = days[0].innerText;
+            }
+        },
+
+        /**
+         * 获取当月坐标（6,5）位置的日期
+         */
+        getCurMonthLastDay: function (days) {
+            if (!this.curMonthLastDay) {
+                this.curMonthLastDay = days[days.length - 1].innerText;
             }
         },
 
@@ -455,19 +484,21 @@ var Calendar = (function () {
                 this.getTempDate();
                 this.swapEle();
 
+                //获取当月日期数据
+                this.getCurDays();
+
                 //选择当月默认日期
                 this.selectDefaultDay();
+
+                this.weekIndexTemp = this.weekIndex;
 
                 //重写标题日期
                 this.rewriteTitle(this.year, this.monthTemp, this.day);
 
-                //重置月份面板横向滑动锁
+                //释放月份面板横向滑动动画锁
                 this.afterSlideLock = false;
-
-                //横滑之后的回调
-                if (this.options.afterSlide) {
-                    this.options.afterSlide.bind(this)();
-                }
+            } else {
+                this.weekIndex = this.weekIndexTemp;
             }
             if (this.slideDir === 3 || this.slideDir === 4) {
                 this.startAnimation(this.months, 'left', 0.2);
@@ -491,13 +522,21 @@ var Calendar = (function () {
             //重置是否可以获取必要的日历数据开关
             this.getData = true;
 
-            //重置滑动方向
-            this.slideDir = 0;
-
             //恢复允许单个日期的点击
             setTimeout(function () {
                 this.selectAllowed = true;
             }.bind(this), 10);
+        },
+
+        /**
+         * 获取当月所有日期数据
+         */
+        getCurDays: function () {
+            for (var i = 0; i < this.monthsLeft.length; i++) {
+                if (this.monthsLeft[i].left === 0) {
+                    this.curDays = this.monthsLeft[i].days;
+                }
+            }
         },
 
         /**
@@ -634,6 +673,7 @@ var Calendar = (function () {
                     }
                     break;
             }
+            this.slide();
         },
 
         /**
@@ -755,6 +795,9 @@ var Calendar = (function () {
                 this.monthsLeftOrigin[w] = this.months[w].offsetLeft;
             }
 
+            //设置当月初始日期数据
+            this.curDays = this.monthsLeft[1].days;
+
             //设置monthsTop的初始值
             for (var a = 0; a < this.months[1].childNodes.length; a++) {
                 this.monthsTop.push(a === 0 ? 0 : -this.months[1].childNodes[a].offsetHeight * a);
@@ -790,44 +833,36 @@ var Calendar = (function () {
                 this.weeks[y].classList.remove('curWeek');
             }
             if (this.fold) {
-                for (var c = 0; c < this.monthsLeft.length; c++) {
-                    if (this.monthsLeft[c].left === 0) {
-                        _selectedDay = this.monthsLeft[c].days[this.weekIndex * 7];
+                _selectedDay = this.curDays[this.weekIndex * 7];
+                _selectedDay.classList.add('selected');
+                _selectedDay.parentNode.classList.add('curWeek');
+                this.curWeek = _selectedDay.parentNode;
+                this.day = this.dayTemp = this.curDays[this.weekIndex * 7].innerText;
+
+                //在日历收起状态，则需要统一所有日期的显示样式（不区分上月，本月，下月）
+                for (var d = 0; d < this.curDays.length; d++) {
+                    if (this.curDays[d].className.indexOf('cur') === -1) {
+                        this.curDays[d].classList.add('foldStatus');
+                    }
+                }
+
+                //如果默认选择为上个月的日期，则当前标题月份显示需要-1
+                if (_selectedDay.className.indexOf('last') !== -1) {
+                    this.monthTemp--;
+                }
+
+                //如果默认选择为下个月的日期，则当前标题月份显示需要+1
+                if (_selectedDay.className.indexOf('next') !== -1) {
+                    this.monthTemp++;
+                }
+            } else {
+                for (var b = 0; b < this.curDays.length; b++) {
+                    if (this.curDays[b].innerText === '1') {
+                        _selectedDay = this.curDays[b];
                         _selectedDay.classList.add('selected');
                         _selectedDay.parentNode.classList.add('curWeek');
                         this.curWeek = _selectedDay.parentNode;
-                        this.day = this.dayTemp = this.monthsLeft[c].days[this.weekIndex * 7].innerText;
-
-                        //在日历收起状态，则需要统一所有日期的显示样式（不区分上月，本月，下月）
-                        for (var d = 0; d < this.monthsLeft[c].days.length; d++) {
-                            if (this.monthsLeft[c].days[d].className.indexOf('cur') === -1) {
-                                this.monthsLeft[c].days[d].classList.add('foldStatus');
-                            }
-                        }
-
-                        //如果默认选择为上个月的日期，则当前标题月份显示需要-1
-                        if (_selectedDay.className.indexOf('last') !== -1) {
-                            this.monthTemp--;
-                        }
-
-                        //如果默认选择为下个月的日期，则当前标题月份显示需要+1
-                        if (_selectedDay.className.indexOf('next') !== -1) {
-                            this.monthTemp++;
-                        }
-                    }
-                }
-            } else {
-                for (var a = 0; a < this.monthsLeft.length; a++) {
-                    if (this.monthsLeft[a].left === 0) {
-                        for (var b = 0; b < this.monthsLeft[a].days.length; b++) {
-                            if (this.monthsLeft[a].days[b].innerText === '1') {
-                                _selectedDay = this.monthsLeft[a].days[b];
-                                _selectedDay.classList.add('selected');
-                                _selectedDay.parentNode.classList.add('curWeek');
-                                this.curWeek = _selectedDay.parentNode;
-                                break;
-                            }
-                        }
+                        break;
                     }
                 }
             }
@@ -858,6 +893,7 @@ var Calendar = (function () {
 
             //修改weekIndex的值
             this.weekIndex = parseInt(_curWeek.getAttribute('data-row'));
+            this.weekIndexTemp = this.weekIndex;
 
             //重写日期标题
             this.dayTemp = e.target.innerText;
@@ -866,18 +902,27 @@ var Calendar = (function () {
                 this.month = this.monthTemp;
                 this.day = this.dayTemp;
                 this.rewriteTitle(this.year, this.month, this.day);
+
+                //设置this.curMonthFirstDay的值
+                this.getCurMonthFirstDay(this.curDays);
             } else if (e.target.className.indexOf('last') !== -1) {
                 this.yearTemp = this.month + 1 === 1 ? this.year - 1 : this.year;
                 this.monthTemp = this.month + 1 === 1 ? 11 : this.month - 1;
                 this.rewriteTitle(this.yearTemp, this.monthTemp, this.dayTemp);
                 this.yearTemp = this.year;
                 this.monthTemp = this.month;
+
+                //设置this.curMonthFirstDay的值
+                this.getCurMonthFirstDay(this.curDays);
             } else if (e.target.className.indexOf('next') !== -1) {
                 this.yearTemp = this.month + 1 === 12 ? this.year + 1 : this.year;
                 this.monthTemp = this.month + 1 === 12 ? 0 : this.month + 1;
                 this.rewriteTitle(this.yearTemp, this.monthTemp, this.dayTemp);
                 this.yearTemp = this.year;
                 this.monthTemp = this.month;
+
+                //设置this.curMonthLastDay的值
+                this.getCurMonthLastDay(this.curDays);
             }
 
             //用户点击日期的回调
@@ -931,13 +976,51 @@ var Calendar = (function () {
         },
 
         /**
+         * 面板左右滑动动画结束之后
+         */
+        afterSlide: function () {
+            var _redDotArr = null;
+
+            //滑到上个月之后的回调
+            if (this.options.afterSlideToLast && this.slideDir === 4) {
+                _redDotArr = this.options.afterSlideToLast.bind(this)().redDotArr || [];
+            }
+
+            //滑到下个月之后的回调
+            // if (this.options.afterSlideToNext && this.slideDir === 3) {
+            //     _redDotArr = this.options.afterSlideToNext.bind(this)().redDotArr || [];
+            // }
+
+            //将红点标记数组中的年份和月份去除
+            _redDotArr = this.removeUnnecessary(_redDotArr, this.curDays);
+
+            //在日历上渲染红点标记
+            this.renderRedDot(_redDotArr);
+
+            //重置滑动方向
+            this.slideDir = 0;
+        },
+
+        /**
+         * 修改后台红点数据
+         */
+        removeUnnecessary: function (arr) {
+            var _arr = arr || [],
+                _res = [];
+            for (var i = 0; i < _arr.length; i++) {
+                _res.push(parseInt(_arr[i].split('-').pop()).toString());
+            }
+            return _res;
+        },
+
+        /**
          * 在有计划的日期上添加红点标记
          */
         renderRedDot: function (planArr) {
             var _pa = planArr || [];
 
             //如果不存在红点最外层盒子则返回
-            if(!this.redDotBox){
+            if (!this.redDotBox) {
                 return;
             }
 
