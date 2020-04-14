@@ -34,27 +34,25 @@
 <script type="text/javascript" src="js/calendar.js"></script>
 <script type="text/javascript">
     var myCalendar = new Calendar('#calendar'/*日历最外层盒子id*/, {
+        getRedDotArr: function () {
+            return ['2020-04-01', '2020-04-08', '2020-04-09', '2020-04-10', '2020-04-11', '2020-04-12', '2020-04-13', '2020-04-17', '2020-04-23'];
+        },
         afterInit: function () {
-            return {redDotArr: ['2020-04-01', '2020-04-08', '2020-04-09', '2020-04-10', '2020-04-11', '2020-04-12', '2020-04-13', '2020-04-17', '2020-04-23']};
+            return {redDotArrFn: this.redDotArrFn()};
         },
         afterSelect: function () {
-            // console.log('点击日期');
         },
         afterSlideToLast: function () {
             return {redDotArr: ['2020-04-01', '2020-04-08', '2020-04-09', '2020-04-10', '2020-04-11', '2020-04-12', '2020-04-13', '2020-04-17', '2020-04-23']};
         },
         afterSlideToNext: function () {
-            // console.log('手指向左滑动');
         },
         afterFold: function () {
-            // console.log('日历收起');
         },
         afterUnfold: function () {
-            // console.log('日历展开');
         },
-        redDot: true //生成红点标记
     });
-    // console.log(myCalendar.getTitleInfo()); //获取当前年月日
+    // console.log(myCalendar.getTitleInfo()); //获取当前年、月、日
 </script>
 </body>
 </html>

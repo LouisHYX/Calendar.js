@@ -11,6 +11,7 @@ var Calendar = (function () {
     function Calendar(el, options) {
         var _el = el || '#calendar', //calendar最外层盒子id
             _options = { //默认配置参数
+                getRedDotArr: null, //获取红点标记数据的方法
                 afterInit: null, //初始化完成之后的回调
                 afterSelect: null, //点击日期之后的回调
                 afterSlideToLast: null, //滑到上个月之后的回调
@@ -18,12 +19,15 @@ var Calendar = (function () {
                 afterFold: null, //收起之后的回调
                 afterUnfold: null, //展开之后的回调
                 afterReset: null, //点击回今天按钮之后的回调
-                redDot: false //是否生成日历红点标记
             };
 
         //配置参数
         this.options = Utils.comParams(options || {}, _options);
+
+        //红点标记
+        this.redDotArrFn = this.options.getRedDotArr instanceof Function ? this.options.getRedDotArr : null; //指向后台读取红点标记数组的方法
         this.redDotArr = null; //指向后台读取的红点标记数组
+        this.redDots = []; //保存创建的红点信息，包括：红点节点，红点位置，红点是否显示
 
         //DOM节点
         this.calendar = document.querySelector(_el);
@@ -39,7 +43,7 @@ var Calendar = (function () {
         this.days1 = this.months[1].querySelectorAll(_el + ' .day');
         this.days2 = this.months[2].querySelectorAll(_el + ' .day');
         this.foldBox = this.calendarPanel.querySelector(_el + ' .foldBox');
-        this.redDotBox = this.options.redDot ? this.createRedDotBox() : null;
+        this.redDotBox = this.redDotArrFn ? this.createRedDotBox() : null;
 
         //事件
         this.events = [ //所有事件存放于该数组，等待程序逐一绑定
@@ -83,7 +87,7 @@ var Calendar = (function () {
                         this.afterSlide();
 
                         //生成红点标记
-                        this.renderRedDot(this.options.redDot);
+                        this.renderRedDot(this.redDotArr, this.curDays);
 
                         //重置面板横向滑动动画锁
                         this.afterSlideLock = true;
@@ -157,7 +161,7 @@ var Calendar = (function () {
         this.weekIndexTemp = 0; //缓存日历收起时所展示的当月星期索引，若没有真正的滑动面板，则重新将原值赋给weekIndex
         this.curMonthFirstDay = null; //当前月份面板坐标(0, 0)位置的日期
         this.curMonthLastDay = null; //当前月份面板坐标(6, 5)位置的日期
-        this.fold = true; //日历是否为收起状态
+        this.fold = false; //日历是否为收起状态
         this.curDays = null; //存放当月所有日期
         this.monthsLeftOrigin = []; //存放三个月份面板的left值，该属性作为日历重置时的基本数据
         this.monthsLeft = []; //存放三个月份面板的left值，在滑动过程中刷新该数组，作为滑动后面板位置的终值
@@ -197,7 +201,7 @@ var Calendar = (function () {
          */
         afterInitCallBack: function () {
             if (this.options.afterInit && this.options.afterInit instanceof Function) {
-                this.redDotArr = this.options.afterInit.bind(this)().redDotArr;
+                this.redDotArr = this.options.afterInit.bind(this)().redDotArrFn;
             }
 
             //生成红点标记
@@ -1044,6 +1048,9 @@ var Calendar = (function () {
             //将数组中的年份和月份去除
             arr = this.dataSimplification(arr);
 
+            //创建红点
+            this.createRedDot(arr.length);
+
             //渲染红点
             this.renderAllRedDots(arr, days);
         },
@@ -1052,8 +1059,22 @@ var Calendar = (function () {
          * 渲染所需的红点标记
          */
         renderAllRedDots: function (arr, days) {
-            var _dots = this.createRedDot(arr.length),
-                _ds = days;
+            var _arr = arr,
+                _days = days,
+                _rdn = 0;
+
+            for (var i = 0; i < _arr.length; i++) {
+                for (var j = 0; j < _days.length; j++) {
+                    if (_arr[i] === _days[j].innerText) {
+                        this.redDots[_rdn].rd.style.left = _days[j].offsetWidth * (Math.floor(j / 7) + 1) + (parseInt(_days[j].style.marginLeft) + parseInt(_days[j].style.marginLeft) * Math.floor(j / 7)) - 10 + 'px';
+                        this.redDots[_rdn].rd.style.top = 92 + _days[j].offsetHeight * (Math.floor(j / 7)) + 4 + 'px';
+                        _rdn++;
+                        console.log(j);
+                        break;
+                    }
+                }
+
+            }
 
         },
 
@@ -1062,19 +1083,26 @@ var Calendar = (function () {
          */
         createRedDot: function (l) {
             var _fragment = document.createDocumentFragment(),
-                _redDot = [],
-                _span = null;
+                _span = null,
+                _rl = this.redDots.length;
 
-            for (var i = 0; i < l; i++) {
+            //如果之前创建过足够数量的红点，则不需要继续创建
+            if (l <= _rl) {
+                return;
+            }
+
+            for (var i = 0; i < l - _rl; i++) {
                 _span = document.createElement('span');
                 _span.className = 'redDot';
                 _fragment.appendChild(_span);
-                _redDot.push(_span);
+                this.redDots.push({
+                    rd: _span,
+                    pos: [],
+                    show: false
+                });
             }
 
             this.redDotBox.appendChild(_fragment);
-
-            return _redDot;
         },
 
         /**
