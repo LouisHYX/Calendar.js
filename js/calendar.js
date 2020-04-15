@@ -84,7 +84,7 @@ var Calendar = (function () {
                     if (!this.afterSlideLock) {
 
                         //面板左右滑动动画结束之后的操作
-                        this.afterSlide();
+                        this.afterSlideHorizontal();
 
                         //重置面板横向滑动动画锁
                         this.afterSlideLock = true;
@@ -158,7 +158,7 @@ var Calendar = (function () {
         this.weekIndexTemp = 0; //缓存日历收起时所展示的当月星期索引，若没有真正的滑动面板，则重新将原值赋给weekIndex
         this.curMonthFirstDay = null; //当前月份面板坐标(0, 0)位置的日期
         this.curMonthLastDay = null; //当前月份面板坐标(6, 5)位置的日期
-        this.fold = false; //日历是否为收起状态
+        this.fold = true; //日历是否为收起状态
         this.curDays = null; //存放当月所有日期
         this.monthsLeftOrigin = []; //存放三个月份面板的left值，该属性作为日历重置时的基本数据
         this.monthsLeft = []; //存放三个月份面板的left值，在滑动过程中刷新该数组，作为滑动后面板位置的终值
@@ -995,14 +995,13 @@ var Calendar = (function () {
         /**
          * 面板左右滑动动画结束之后
          */
-        afterSlide: function () {
+        afterSlideHorizontal: function () {
             var _redDotArr = null;
 
             //滑到上个月之后的回调
             if (this.options.afterSlideToLast && this.slideDir === 4 && this.options.afterSlideToLast instanceof Function) {
                 _redDotArr = this.options.afterSlideToLast.bind(this)().redDotArrFn;
             }
-
 
             //滑到下个月之后的回调
             if (this.options.afterSlideToNext && this.slideDir === 3 && this.options.afterSlideToNext instanceof Function) {
