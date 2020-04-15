@@ -27,7 +27,8 @@ var Calendar = (function () {
         //红点标记
         this.redDotArrFn = this.options.getRedDotArr instanceof Function ? this.options.getRedDotArr : null; //指向后台读取红点标记数组的方法
         this.redDotArr = null; //指向后台读取的红点标记数组
-        this.redDots = []; //保存创建的红点信息，包括：红点节点，红点位置，红点是否显示
+        this.redDotCarrier = []; //保存红点所在的节点
+        this.mark = 'mark'; //保存生成红点的class
 
         //DOM节点
         this.calendar = document.querySelector(_el);
@@ -43,7 +44,6 @@ var Calendar = (function () {
         this.days1 = this.months[1].querySelectorAll(_el + ' .day');
         this.days2 = this.months[2].querySelectorAll(_el + ' .day');
         this.foldBox = this.calendarPanel.querySelector(_el + ' .foldBox');
-        this.redDotBox = this.redDotArrFn ? this.createRedDotBox() : null;
 
         //事件
         this.events = [ //所有事件存放于该数组，等待程序逐一绑定
@@ -85,9 +85,6 @@ var Calendar = (function () {
 
                         //面板左右滑动动画结束之后的操作
                         this.afterSlide();
-
-                        //生成红点标记
-                        this.renderRedDot(this.redDotArr, this.curDays);
 
                         //重置面板横向滑动动画锁
                         this.afterSlideLock = true;
@@ -794,8 +791,8 @@ var Calendar = (function () {
                     for (var d = 0; d < 7; d++) {
                         _span = document.createElement('span');
                         _span.classList.add('day');
-                        _li.appendChild(_span);
                         _span.innerText = d.toString();
+                        _li.appendChild(_span);
                     }
                     _ul.appendChild(_li);
                 }
@@ -1003,31 +1000,20 @@ var Calendar = (function () {
 
             //滑到上个月之后的回调
             if (this.options.afterSlideToLast && this.slideDir === 4 && this.options.afterSlideToLast instanceof Function) {
-                _redDotArr = this.options.afterSlideToLast.bind(this)().redDotArr || [];
+                _redDotArr = this.options.afterSlideToLast.bind(this)().redDotArrFn;
             }
 
+
             //滑到下个月之后的回调
-            // if (this.options.afterSlideToNext && this.slideDir === 3 && this.options.afterSlideToNext instanceof Function) {
-            //     _redDotArr = this.options.afterSlideToNext.bind(this)().redDotArr || [];
-            // }
+            if (this.options.afterSlideToNext && this.slideDir === 3 && this.options.afterSlideToNext instanceof Function) {
+                _redDotArr = this.options.afterSlideToNext.bind(this)().redDotArrFn;
+            }
 
             //在日历上渲染红点标记
             this.renderRedDot(_redDotArr, this.curDays);
 
             //重置滑动方向
             this.slideDir = 0;
-        },
-
-        /**
-         * 修改后台红点数据
-         */
-        dataSimplification: function (arr) {
-            var _arr = arr || [],
-                _res = [];
-            for (var i = 0; i < _arr.length; i++) {
-                _res.push(parseInt(_arr[i].split('-').pop()).toString());
-            }
-            return _res;
         },
 
         /**
@@ -1040,18 +1026,13 @@ var Calendar = (function () {
                 return;
             }
 
-            //如果不存在红点最外层盒子则返回
-            if (!this.redDotBox) {
-                return;
-            }
-
             //将数组中的年份和月份去除
             arr = this.dataSimplification(arr);
 
-            //创建红点
-            this.createRedDot(arr.length);
+            //再正式添加之前，先清除之前的红点
+            this.removeExisting();
 
-            //渲染红点
+            //正式添加红点
             this.renderAllRedDots(arr, days);
         },
 
@@ -1060,16 +1041,13 @@ var Calendar = (function () {
          */
         renderAllRedDots: function (arr, days) {
             var _arr = arr,
-                _days = days,
-                _rdn = 0;
+                _days = days;
 
             for (var i = 0; i < _arr.length; i++) {
                 for (var j = 0; j < _days.length; j++) {
-                    if (_arr[i] === _days[j].innerText) {
-                        this.redDots[_rdn].rd.style.left = _days[j].offsetWidth * (Math.floor(j / 7) + 1) + (parseInt(_days[j].style.marginLeft) + parseInt(_days[j].style.marginLeft) * Math.floor(j / 7)) - 10 + 'px';
-                        this.redDots[_rdn].rd.style.top = 92 + _days[j].offsetHeight * (Math.floor(j / 7)) + 4 + 'px';
-                        _rdn++;
-                        console.log(j);
+                    if (_arr[i] === _days[j].innerText && _days[j].className.indexOf('cur') !== -1) {
+                        _days[j].classList.add(this.mark);
+                        this.redDotCarrier.push(_days[j]);
                         break;
                     }
                 }
@@ -1079,39 +1057,24 @@ var Calendar = (function () {
         },
 
         /**
-         * 创建红点
+         * 修改后台红点数据
          */
-        createRedDot: function (l) {
-            var _fragment = document.createDocumentFragment(),
-                _span = null,
-                _rl = this.redDots.length;
-
-            //如果之前创建过足够数量的红点，则不需要继续创建
-            if (l <= _rl) {
-                return;
+        dataSimplification: function (arr) {
+            var _res = [];
+            for (var i = 0; i < arr.length; i++) {
+                _res.push(parseInt(arr[i].split('-').pop()).toString());
             }
-
-            for (var i = 0; i < l - _rl; i++) {
-                _span = document.createElement('span');
-                _span.className = 'redDot';
-                _fragment.appendChild(_span);
-                this.redDots.push({
-                    rd: _span,
-                    pos: [],
-                    show: false
-                });
-            }
-
-            this.redDotBox.appendChild(_fragment);
+            return _res;
         },
 
         /**
-         * 创建所有红点最外层盒子
+         *
          */
-        createRedDotBox: function () {
-            var _div = document.createElement('div');
-            _div.className = 'redDotBox';
-            return this.calendar.insertBefore(_div, this.calendar.childNodes[0]);
+        removeExisting: function () {
+            for (var i = 0; i < this.redDotCarrier.length; i++) {
+                this.redDotCarrier[i].classList.remove(this.mark);
+            }
+            this.redDotCarrier = [];
         },
 
         /**

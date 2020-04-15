@@ -43,9 +43,10 @@
         afterSelect: function () {
         },
         afterSlideToLast: function () {
-            return {redDotArr: ['2020-04-01', '2020-04-08', '2020-04-09', '2020-04-10', '2020-04-11', '2020-04-12', '2020-04-13', '2020-04-17', '2020-04-23']};
+            return {redDotArrFn: this.redDotArrFn()};
         },
         afterSlideToNext: function () {
+            return {redDotArrFn: this.redDotArrFn()};
         },
         afterFold: function () {
         },

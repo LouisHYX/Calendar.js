@@ -12,12 +12,11 @@ body{background: darkgray;padding: 100px 0;margin:0;}
 #calendar .calendarPanel{position:relative;overflow:hidden;text-align: center;color: #333333;/*height:68px;*/height:288px;max-height:288px;min-height:68px;}
 #calendar .calendarPanel .month{position: absolute;left:0;right:0;width: 100%;}
 #calendar .calendarPanel .day{display: inline-block;width:44px;height:44px;line-height:44px;font-size:14px;box-sizing: border-box;transition:all 0.3s ease;color:#bbb;border-radius: 22px;}
-#calendar .calendarPanel .day.cur{color:#333;}
+#calendar .calendarPanel .day.cur{position: relative; color:#333;}
 #calendar .calendarPanel .day.today{background:#e3f4f0;border-radius: 22px;color:#1ccda1; font-weight: bold;}
 #calendar .calendarPanel .day.foldStatus{color:#333;}
 #calendar .calendarPanel .day.selected{background:#1ccda1;border-radius: 22px;color:white; font-weight: bold;}
 #calendar .foldBox{position: absolute; bottom: 0; width: 100%; height: 24px; background: white url("images/arrow_downward.png") no-repeat center; background-size: 16px 6px;}
-#calendar .redDotBox{position: relative; z-index: 999;}
-#calendar .redDotBox .redDot{position: absolute; top:0; left:0; background: #ef3535; width: 12px; height: 12px; border-radius: 6px; border: 2px solid white; box-sizing: border-box;}
+#calendar .mark::after{position: absolute; top:0; right:0; content: ''; width: 12px; height: 12px; background: #ef3535; border-radius: 6px; border: 2px solid white; box-sizing: border-box;}
 
 
