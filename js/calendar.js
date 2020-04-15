@@ -26,7 +26,7 @@ var Calendar = (function () {
 
         //红点标记
         this.redDotArrFn = this.options.getRedDotArr instanceof Function ? this.options.getRedDotArr : null; //指向后台读取红点标记数组的方法
-        this.redDotArr = null; //指向后台读取的红点标记数组
+        // this.redDotArr = null; //指向后台读取的红点标记数组
         this.redDotCarrier = []; //保存红点所在的节点
         this.mark = 'mark'; //保存生成红点的class
 
@@ -198,11 +198,8 @@ var Calendar = (function () {
          */
         afterInitCallBack: function () {
             if (this.options.afterInit && this.options.afterInit instanceof Function) {
-                this.redDotArr = this.options.afterInit.bind(this)().redDotArrFn;
+                this.options.afterInit.bind(this)();
             }
-
-            //生成红点标记
-            this.renderRedDot(this.redDotArr, this.curDays);
         },
 
         /**
@@ -694,7 +691,7 @@ var Calendar = (function () {
         },
 
         /**
-         * 具体实现收起的函数
+         * 具体实现展开的函数
          */
         foldCalendar: function () {
             this.calendarPanel.style.height = this.panelHeight.unfold + 'px';
@@ -706,6 +703,9 @@ var Calendar = (function () {
                 this.days[b].classList.remove('foldStatus');
             }
             this.fold = false;
+
+            //添加红点
+            this.renderRedDot(this.redDotArrFn(), this.curDays);
         },
 
         /**
@@ -723,6 +723,9 @@ var Calendar = (function () {
                 }
             }
             this.fold = true;
+
+            //清除红点
+            this.removeExisting();
         },
 
         /**
@@ -1000,12 +1003,14 @@ var Calendar = (function () {
 
             //滑到上个月之后的回调
             if (this.options.afterSlideToLast && this.slideDir === 4 && this.options.afterSlideToLast instanceof Function) {
-                _redDotArr = this.options.afterSlideToLast.bind(this)().redDotArrFn;
+                _redDotArr = this.redDotArrFn();
+                this.options.afterSlideToLast.bind(this)();
             }
 
             //滑到下个月之后的回调
             if (this.options.afterSlideToNext && this.slideDir === 3 && this.options.afterSlideToNext instanceof Function) {
-                _redDotArr = this.options.afterSlideToNext.bind(this)().redDotArrFn;
+                _redDotArr = this.redDotArrFn();
+                this.options.afterSlideToNext.bind(this)();
             }
 
             //在日历上渲染红点标记
@@ -1022,6 +1027,10 @@ var Calendar = (function () {
 
             //如果参数不满足要求则返回
             if ((!arr || !days) || (arr.length === 0 || days.length === 0)) {
+                return;
+            }
+
+            if (this.fold) {
                 return;
             }
 
@@ -1044,7 +1053,7 @@ var Calendar = (function () {
 
             for (var i = 0; i < _arr.length; i++) {
                 for (var j = 0; j < _days.length; j++) {
-                    if (_arr[i] === _days[j].innerText && _days[j].className.indexOf('cur') !== -1) {
+                    if (_arr[i] === _days[j].innerText && days[j].className.indexOf('cur') !== -1) {
                         _days[j].classList.add(this.mark);
                         this.redDotCarrier.push(_days[j]);
                         break;
@@ -1074,6 +1083,13 @@ var Calendar = (function () {
                 this.redDotCarrier[i].classList.remove(this.mark);
             }
             this.redDotCarrier = [];
+        },
+
+        /**
+         * 手动刷新红点
+         */
+        renderRedDotManually: function () {
+            this.renderRedDot(this.redDotArrFn(), this.curDays);
         },
 
         /**
