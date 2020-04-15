@@ -237,6 +237,9 @@ var Calendar = (function () {
             if (this.fold) {
                 this.months[1].style.top = -this.curWeek.offsetTop + 'px';
             }
+
+            //添加红点
+            this.renderRedDot(this.redDotArrFn(), this.curDays);
         },
 
         /**
