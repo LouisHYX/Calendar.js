@@ -56,7 +56,7 @@ var Calendar = (function () {
                 event: 'touchend', listener: this.backToToday, handler: function () {
                     this.reset();
                     if (this.options.afterReset && this.options.afterReset instanceof Function) {
-                        this.options.afterReset(this.getTitleInfo());
+                        this.options.afterReset.call(this, this.getTitleInfo.bind(this));
                     }
                 }.bind(this)
             },
@@ -1216,6 +1216,3 @@ var Calendar = (function () {
 
     return Calendar;
 })();
-export {
-    Calendar
-};

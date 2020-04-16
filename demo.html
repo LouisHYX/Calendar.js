@@ -49,10 +49,9 @@
 
         },
         afterUnfold: function () {
-
         },
-        afterReset: function () {
-
+        afterReset: function (fn) {
+            fn();
         }
     });
     // myCalendar.renderRedDotManually(); //手动添加红点标记
