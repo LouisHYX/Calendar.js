@@ -56,7 +56,7 @@ var Calendar = (function () {
                 event: 'touchend', listener: this.backToToday, handler: function () {
                     this.reset();
                     if (this.options.afterReset && this.options.afterReset instanceof Function) {
-                        this.options.afterReset(this.getTitleInfo());
+                        this.options.afterReset();
                     }
                 }.bind(this)
             },
@@ -328,7 +328,8 @@ var Calendar = (function () {
                 _lastMonth = _month - 1 >= 0 ? _month - 1 : 11, //获取上个月的月份
                 _lastYear = _lastMonth !== 11 ? _year : _year - 1, //获取上个月的年份
                 _nextMonth = _month + 1 <= 11 ? _month + 1 : 0, //获取上个月的月份
-                _nextYear = _nextMonth !== 0 ? _year : _year + 1; //获取下个月的年份
+                _nextYear = _nextMonth !== 0 ? _year : _year + 1, //获取下个月的年份
+                _firstDayPos = null;
 
             switch (_dir) {
                 case 0:
@@ -767,11 +768,11 @@ var Calendar = (function () {
         foldOrUnfoldCallback: function () {
             if (this.fold) {
                 if (this.options.afterFold && this.options.afterFold instanceof Function) {
-                    this.options.afterFold.bind(this)(this.getTitleInfo());
+                    this.options.afterFold.bind(this)();
                 }
             } else {
                 if (this.options.afterUnfold && this.options.afterUnfold instanceof Function) {
-                    this.options.afterUnfold.bind(this)(this.getTitleInfo());
+                    this.options.afterUnfold.bind(this)();
                 }
             }
         },
@@ -949,7 +950,7 @@ var Calendar = (function () {
 
             //用户点击日期的回调
             if (this.options.afterSelect && this.options.afterSelect instanceof Function) {
-                this.options.afterSelect.bind(this)(this.getTitleInfo());
+                this.options.afterSelect.bind(this)();
             }
         },
 
@@ -1216,6 +1217,3 @@ var Calendar = (function () {
 
     return Calendar;
 })();
-export {
-    Calendar
-};
