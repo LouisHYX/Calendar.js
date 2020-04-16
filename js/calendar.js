@@ -56,7 +56,7 @@ var Calendar = (function () {
                 event: 'touchend', listener: this.backToToday, handler: function () {
                     this.reset();
                     if (this.options.afterReset && this.options.afterReset instanceof Function) {
-                        this.options.afterReset.call(this, this.getTitleInfo.bind(this));
+                        this.options.afterReset(this.getTitleInfo());
                     }
                 }.bind(this)
             },
