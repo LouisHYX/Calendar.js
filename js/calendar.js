@@ -25,7 +25,8 @@ var Calendar = (function () {
         this.options = Utils.comParams(options || {}, _options);
 
         //红点标记
-        this.redDotArrFn = this.options.getRedDotArr instanceof Function ? this.options.getRedDotArr : null; //指向后台读取红点标记数组的方法
+        this.redDotArrFn = this.options.getRedDotArr instanceof Function ? this.options.getRedDotArr : function () {
+        }; //指向后台读取红点标记数组的方法
         // this.redDotArr = null; //指向后台读取的红点标记数组
         this.redDotCarrier = []; //保存红点所在的节点
         this.mark = 'mark'; //保存生成红点的class
