@@ -481,7 +481,6 @@ var Calendar = (function () {
          */
         getTitleInfo: function () {
             var _ymd = this.title.innerText.split('-');
-            console.log(1);
             return {
                 year: parseInt(_ymd[0]),
                 month: parseInt(_ymd[1]),
