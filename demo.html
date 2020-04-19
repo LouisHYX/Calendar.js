@@ -33,7 +33,13 @@
 
 <script type="text/javascript" src="js/calendar.js"></script>
 <script type="text/javascript">
+    var a = 'yes';
     var myCalendar = new Calendar('#calendar'/*日历最外层盒子id*/, {
+        getSavedDate: function () {
+            // return {year: 2020, month: 12, day: 31};
+            // return {year: 2021, month: 1, day: 1};
+            return null;
+        },
         getRedDotArr: function () {
             return ['2020-04-01', '2020-04-08', '2020-04-09', '2020-04-10', '2020-04-11', '2020-04-12', '2020-04-13', '2020-04-17', '2020-04-23'];
         },
