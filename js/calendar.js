@@ -87,7 +87,6 @@ var Calendar = (function () {
 
                     //横滑之后的操作
                     if (!this.afterSlideLock) {
-                        console.log(this.month, this.monthTemp);
 
                         //面板左右滑动动画结束之后的操作
                         this.afterSlideHorizontal();
@@ -516,9 +515,6 @@ var Calendar = (function () {
                 this.selectDefaultDay();
 
                 this.weekIndexTemp = this.weekIndex;
-
-                console.log(this.month, this.monthTemp, this.weekIndex);
-
 
                 //重写标题日期
                 this.rewriteTitle(this.year, this.monthTemp, this.day);
@@ -1105,15 +1101,6 @@ var Calendar = (function () {
          */
         renderRedDotManually: function () {
             this.renderRedDot(this.redDotArrFn(), this.curDays);
-        },
-
-        /**
-         * 获取日历当前应该展示的日期
-         */
-        getCurDate: function () {
-            this.curDate.year = 2021;
-            this.curDate.month = 12;
-            this.curDate.day = 31;
         },
 
         /**
