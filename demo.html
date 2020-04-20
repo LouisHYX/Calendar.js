@@ -55,11 +55,12 @@
         },
         afterUnfold: function () {
         },
-        afterReset: function () {
-        },
-        // afterReset: getTitleInfo => {
-        //
-        // }
+        // afterReset: function () {
+        //     console.log(1);
+        // },
+        afterReset: getTitleInfo => {
+            console.log(1);
+        }
     });
     // myCalendar.renderRedDotManually(); //手动添加红点标记
     // myCalendar.getTitleInfo(); //获取Title中的日期信息：包括年、月、日

@@ -88,6 +88,8 @@ var Calendar = (function () {
                     //横滑之后的操作
                     if (!this.afterSlideLock) {
 
+                        console.log(this.day);
+
                         //面板左右滑动动画结束之后的操作
                         this.afterSlideHorizontal();
 
@@ -927,8 +929,8 @@ var Calendar = (function () {
 
             //手动选择日期之后重写日期标题
             this.dayTemp = _curDay.innerText;
+            this.day = this.dayTemp;
             if (_curDay.className.indexOf('cur') !== -1) {
-                this.day = this.dayTemp;
                 this.rewriteTitle(this.year, this.month, this.day);
 
                 //设置this.curMonthFirstDay的值
