@@ -88,8 +88,6 @@ var Calendar = (function () {
                     //横滑之后的操作
                     if (!this.afterSlideLock) {
 
-                        console.log(this.day);
-
                         //面板左右滑动动画结束之后的操作
                         this.afterSlideHorizontal();
 
