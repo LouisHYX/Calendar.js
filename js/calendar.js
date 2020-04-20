@@ -94,7 +94,6 @@ var Calendar = (function () {
                         //重置面板横向滑动动画锁
                         this.afterSlideLock = true;
                     }
-
                 }.bind(this)
             },
             {
@@ -372,7 +371,6 @@ var Calendar = (function () {
                                 this.renderData(Utils.getMonthData(_nextYear, _nextMonth), this.monthsLeft[a].days);
                                 this.yearTemp = _nextYear;
                                 this.monthTemp = _nextMonth;
-                                this.dayTemp = 1;
                             }
                             break;
                         }
@@ -407,7 +405,6 @@ var Calendar = (function () {
                                 this.renderData(Utils.getMonthData(_lastYear, _lastMonth), this.monthsLeft[b].days);
                                 this.yearTemp = _lastYear;
                                 this.monthTemp = _lastMonth;
-                                this.dayTemp = 1;
                             }
                             break;
                         }
@@ -889,7 +886,7 @@ var Calendar = (function () {
                 }
             } else {
                 for (var b = 0; b < this.curDays.length; b++) {
-                    if (this.curDays[b].innerText === '1') {
+                    if (this.curDays[b].innerText === this.dayTemp.toString()) {
                         _selectedDay = this.curDays[b];
                         _selectedDay.classList.add('selected');
                         _selectedDay.parentNode.classList.add('curWeek');
