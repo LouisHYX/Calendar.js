@@ -958,7 +958,7 @@ var Calendar = (function () {
 
             //用户点击日期的回调
             if (this.options.afterSelect && this.options.afterSelect instanceof Function) {
-                this.options.afterSelect.bind(this)(this.curDate = this.getTitleInfo());
+                this.options.afterSelect.bind(this)(this.getTitleInfo());
             }
         },
 
