@@ -33,7 +33,6 @@
 
 <script type="text/javascript" src="js/calendar.js"></script>
 <script type="text/javascript">
-    var a = 'yes';
     var myCalendar = new Calendar('#calendar'/*日历最外层盒子id*/, {
         getSavedDate: function () {
             // return {year: 2020, month: 12, day: 31};
@@ -59,7 +58,6 @@
         //     console.log(1);
         // },
         afterReset: getTitleInfo => {
-            console.log(1);
         }
     });
     // myCalendar.renderRedDotManually(); //手动添加红点标记

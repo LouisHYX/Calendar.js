@@ -390,7 +390,6 @@ var Calendar = (function () {
                                     for (var y = this.monthsLeft[b].days.length - 1; y >= 0; y--) {
                                         if (this.monthsLeft[b].days[y].innerText === this.curMonthFirstDay) {
                                             this.weekIndex = (Math.floor(y / 7) === 0 ? 4 : Math.floor(y / 7) - 1);
-
                                             break;
                                         }
                                     }
@@ -1240,6 +1239,5 @@ var Calendar = (function () {
 
         return _utils;
     })();
-
     return Calendar;
 })();

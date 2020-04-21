@@ -37,7 +37,7 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
-    <property name="two.files.diff.last.used.file" value="$USER_HOME$/Desktop/CRMVue/src/assets/js/calendar.js" />
+    <property name="two.files.diff.last.used.file" value="$USER_HOME$/Desktop/calendar.js" />
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -81,7 +81,8 @@
       <workItem from="1587311528213" duration="2756000" />
       <workItem from="1587350894831" duration="7138000" />
       <workItem from="1587369826374" duration="1738000" />
-      <workItem from="1587377510845" duration="1576000" />
+      <workItem from="1587377510845" duration="1878000" />
+      <workItem from="1587433071922" duration="1923000" />
     </task>
     <servers />
   </component>
@@ -93,9 +94,10 @@
       <screen x="0" y="23" width="2048" height="1062" />
     </state>
     <state x="762" y="308" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.23.2048.1062@0.23.2048.1062" timestamp="1586349041244" />
-    <state x="100" y="118" width="1848" height="872" key="DiffContextDialog" timestamp="1587002412495">
-      <screen x="0" y="23" width="2048" height="1072" />
+    <state x="-1" y="42" width="2049" height="1072" maximized="true" key="DiffContextDialog" timestamp="1587434191003">
+      <screen x="0" y="23" width="2048" height="1071" />
     </state>
+    <state x="-1" y="42" width="2049" height="1072" maximized="true" key="DiffContextDialog/0.23.2048.1071@0.23.2048.1071" timestamp="1587434191003" />
     <state x="100" y="118" width="1848" height="872" key="DiffContextDialog/0.23.2048.1072@0.23.2048.1072" timestamp="1587002412495" />
     <state x="612" y="303" key="IDE.errors.dialog" timestamp="1583547913660">
       <screen x="0" y="23" width="2048" height="1060" />
