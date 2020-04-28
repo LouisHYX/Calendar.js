@@ -17,6 +17,8 @@ body{background: darkgray;padding: 100px 0;margin:0;}
 #calendar .calendarPanel .day.foldStatus{color:#333;}
 #calendar .calendarPanel .day.selected{background:#1ccda1;border-radius: 22px;color:white; font-weight: bold;}
 #calendar .foldBox{position: absolute; bottom: 0; width: 100%; height: 24px; background: white url("images/arrow_downward.png") no-repeat center; background-size: 16px 6px;}
+#calendar .foldBox.foldImage{background: white url("images/arrow_downward.png") no-repeat center;}
+#calendar .foldBox.unfoldImage{background: white url("images/arrow_upward.png") no-repeat center;}
 
 /*红点*/
 #calendar .mark::after{position: absolute; top:0; right:0; content: ''; width: 12px; height: 12px; background: #ef3535; border-radius: 6px; border: 2px solid white; box-sizing: border-box;}
