@@ -13,7 +13,7 @@
     <!--以下是日历主结构-->
     <div id="calendar">
         <div class="titleBar">
-            <div class="title" data-date=""></div>
+            <div class="title" data-date=''></div>
             <div class="backToToday">回今天</div>
         </div>
         <ul class="weekBar">
@@ -45,6 +45,7 @@
         afterInit: function () {
         },
         afterSelect: function () {
+            // console.log(this.getTitleInfo());
         },
         afterSlideToLast: function () {
         },

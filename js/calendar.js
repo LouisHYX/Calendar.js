@@ -208,6 +208,10 @@ var Calendar = (function () {
          * 日历初始化完成后的回调
          */
         afterInitCallBack: function () {
+
+            //添加红点
+            this.renderRedDot(this.redDotArrFn(), this.curDays);
+
             if (this.options.afterInit && this.options.afterInit instanceof Function) {
                 this.options.afterInit.bind(this)();
             }
@@ -250,7 +254,7 @@ var Calendar = (function () {
             }
 
             //添加红点
-            // this.renderRedDot(this.redDotArrFn(), this.curDays);
+            this.renderRedDot(this.redDotArrFn(), this.curDays);
         },
 
         /**
@@ -336,6 +340,9 @@ var Calendar = (function () {
 
                     //设置日历当前应该展示的日期
                     this.setCurDate(_day);
+
+                    //在日历收起状态，则需要统一所有日期的显示样式（不区分上月，本月，下月）
+                    this.useBlackStyle();
 
                     //修改月份面板top值以展示当前星期
                     if (this.fold) {
@@ -466,7 +473,7 @@ var Calendar = (function () {
                 m = 11;
             }
             this.title.setAttribute('data-date', y + '-' + (m + 1) + '-' + d);
-            this.title.innerText = y + '-' + (m + 1) + '-' + d;
+            this.title.innerText = y + '-' + (m + 1);
         },
 
         /**
@@ -509,11 +516,17 @@ var Calendar = (function () {
                 this.swapEle();
                 this.getTempDate();
 
+                //去除日期的选择按钮样式
+                this.removeSelectedStyle();
+
                 //获取当月日期数据
                 this.getCurDays();
 
-                //选择当前默认日期
-                this.selectDefaultDay();
+                //选择当前默getTitleInfo认日期
+                // this.selectDefaultDay();
+
+                //在日历收起状态，则需要统一所有日期的显示样式（不区分上月，本月，下月）
+                this.useBlackStyle();
 
                 this.weekIndexTemp = this.weekIndex;
 
@@ -685,16 +698,14 @@ var Calendar = (function () {
             switch (this.fold) {
                 case true:
                     this.calendarPanel.style.height = this.panelHeight.fold + 'px';
-                    this.foldBox.classList.remove('unfoldImage');
-                    this.foldBox.classList.add('foldImage');
+                    this.foldBox.style.backgroundImage = 'url("images/arrow_downward.png")';
                     for (var i = 0; i < this.months.length; i++) {
                         this.months[i].style.top = this.monthTop.fold + 'px';
                     }
                     break;
                 case false:
                     this.calendarPanel.style.height = this.panelHeight.unfold + 'px';
-                    this.foldBox.classList.remove('foldImage');
-                    this.foldBox.classList.add('unfoldImage');
+                    this.foldBox.style.backgroundImage = 'url("images/arrow_upward.png")';
                     for (var j = 0; j < this.months.length; j++) {
                         this.months[j].style.top = this.monthTop.unfold + 'px';
                     }
@@ -710,9 +721,7 @@ var Calendar = (function () {
          */
         foldCalendar: function () {
             this.calendarPanel.style.height = this.panelHeight.unfold + 'px';
-            this.foldBox.classList.remove('foldImage');
-            this.foldBox.classList.add('unfoldImage');
-
+            this.foldBox.style.backgroundImage = 'url("images/arrow_upward.png")';
             for (var a = 0; a < this.months.length; a++) {
                 this.months[a].style.top = this.monthTop.unfold + 'px';
             }
@@ -720,18 +729,14 @@ var Calendar = (function () {
                 this.days[b].classList.remove('foldStatus');
             }
             this.fold = false;
-
-            //添加红点
-            // this.renderRedDot(this.redDotArrFn(), this.curDays);
         },
 
         /**
-         * 具体实现展开的函数
+         * 具体实现收起的函数
          */
         unfoldCalendar: function () {
             this.calendarPanel.style.height = this.panelHeight.fold + 'px';
-            this.foldBox.classList.remove('unfoldImage');
-            this.foldBox.classList.add('foldImage');
+            this.foldBox.style.backgroundImage = 'url("images/arrow_downward.png")';
             for (var c = 0; c < this.months.length; c++) {
                 this.months[c].style.top = this.monthTop.fold + 'px';
             }
@@ -741,9 +746,6 @@ var Calendar = (function () {
                 }
             }
             this.fold = true;
-
-            //清除红点
-            this.removeExisting();
         },
 
         /**
@@ -1031,7 +1033,7 @@ var Calendar = (function () {
             }
 
             //在日历上渲染红点标记
-            // this.renderRedDot(_redDotArr, this.curDays);
+            this.renderRedDot(_redDotArr, this.curDays);
 
             //重置滑动方向
             this.slideDir = 0;
@@ -1044,10 +1046,6 @@ var Calendar = (function () {
 
             //如果参数不满足要求则返回
             if ((!arr || !days) || (arr.length === 0 || days.length === 0)) {
-                return;
-            }
-
-            if (this.fold) {
                 return;
             }
 
@@ -1128,6 +1126,30 @@ var Calendar = (function () {
             //每次刷新日历都需要重新设置一遍当前月份面板的第一个日期和最后一个日期
             this.getCurMonthFirstDay(this.curDays);
             this.getCurMonthLastDay(this.curDays);
+        },
+
+        /**
+         * 在收起状态下统一日期字体颜色
+         */
+        useBlackStyle: function () {
+            if (this.fold) {
+                for (var d = 0; d < this.curDays.length; d++) {
+                    if (this.curDays[d].className.indexOf('cur') === -1) {
+                        this.curDays[d].classList.add('foldStatus');
+                    }
+                }
+            }
+        },
+
+        /**
+         * 去除日期的选择按钮样式
+         */
+        removeSelectedStyle: function () {
+            for (var d = 0; d < this.curDays.length; d++) {
+                if (this.curDays[d].className.indexOf('selected') !== -1) {
+                    this.curDays[d].classList.remove('selected');
+                }
+            }
         },
 
         /**
