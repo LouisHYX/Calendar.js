@@ -1042,33 +1042,33 @@ var Calendar = (function () {
         /**
          * 在有计划的日期上添加红点标记
          */
-        renderRedDot: function (arr, days) {
+        renderRedDot: function (obj, days) {
 
             //如果参数不满足要求则返回
-            if ((!arr || !days) || (arr.length === 0 || days.length === 0)) {
+            if ((!obj || !days) || (obj.length === 0 || days.length === 0)) {
                 return;
             }
 
             //将数组中的年份和月份去除
-            arr = this.dataSimplification(arr);
+            obj = this.dataSimplification(obj);
 
             //再正式添加之前，先清除之前的红点
             this.removeExisting();
 
             //正式添加红点
-            this.renderAllRedDots(arr, days);
+            this.renderAllRedDots(obj, days);
         },
 
         /**
          * 渲染所需的红点标记
          */
-        renderAllRedDots: function (arr, days) {
-            var _arr = arr,
+        renderAllRedDots: function (obj, days) {
+            var _obj = obj,
                 _days = days;
 
-            for (var i = 0; i < _arr.length; i++) {
+            for (var i = 0; i < _obj.length; i++) {
                 for (var j = 0; j < _days.length; j++) {
-                    if (_arr[i] === _days[j].innerText && days[j].className.indexOf('cur') !== -1) {
+                    if (_obj[i] === _days[j].innerText && days[j].className.indexOf('cur') !== -1) {
                         _days[j].classList.add(this.mark);
                         this.redDotCarrier.push(_days[j]);
                         break;
@@ -1082,10 +1082,10 @@ var Calendar = (function () {
         /**
          * 修改后台红点数据
          */
-        dataSimplification: function (arr) {
+        dataSimplification: function (obj) {
             var _res = [];
-            for (var i = 0; i < arr.length; i++) {
-                _res.push(parseInt(arr[i].split('-').pop()).toString());
+            for (var i = 0; i < obj.length; i++) {
+                _res.push(parseInt(obj[i].split('-').pop()).toString());
             }
             return _res;
         },
