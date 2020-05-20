@@ -28,7 +28,6 @@ var Calendar = (function () {
         //红点标记
         this.redDotArrFn = this.options.getRedDotArr instanceof Function ? this.options.getRedDotArr : function () {
         }; //指向后台读取红点标记数组的方法
-        // this.redDotArr = null; //指向后台读取的红点标记数组
         this.redDotCarrier = []; //保存红点所在的节点
         this.mark = 'mark'; //保存生成红点的class
 
@@ -170,6 +169,8 @@ var Calendar = (function () {
         this.curMonthFirstDay = null; //当前月份面板坐标(0, 0)位置的日期
         this.curMonthLastDay = null; //当前月份面板坐标(6, 5)位置的日期
         this.fold = true; //日历是否为收起状态
+        this.curMonth = null; //存放当月
+        this.curWeek = null; //存放当前被选中的日期所在行
         this.curDays = null; //存放当月所有日期
         this.monthsLeftOrigin = []; //存放三个月份面板的left值，该属性作为日历重置时的基本数据
         this.monthsLeft = []; //存放三个月份面板的left值，在滑动过程中刷新该数组，作为滑动后面板位置的终值
@@ -177,7 +178,6 @@ var Calendar = (function () {
         this.panelHeight = {fold: null, unfold: null}; //存放面板的高度，作为展开收起后面板高度的终值
         this.monthTop = {fold: null, unfold: 0}; //存放月份面板的top值，作为展开收起后月份面板的top终值
         this.getData = true; //是否允许从Utils对象中获取日历数据
-        this.curWeek = null; //存放当前被选中的日期所在行
         this.afterSlideLock = true; //横滑动画锁
 
         //初始化
@@ -372,10 +372,8 @@ var Calendar = (function () {
                                             break;
                                         }
                                     }
-                                    this.curMonthLastDay = null;
                                 } else {
                                     this.renderData(Utils.getMonthData(_year, _month), this.monthsLeft[a].days);
-                                    this.getCurMonthLastDay(this.monthsLeft[a].days)
                                 }
                                 this.months[a].style.top = this.monthsTop[this.weekIndex] + 'px'
                             } else {
@@ -383,6 +381,7 @@ var Calendar = (function () {
                                 this.yearTemp = _nextYear;
                                 this.monthTemp = _nextMonth;
                             }
+                            this.getCurMonthFirstDay(this.monthsLeft[a].days);
                             break;
                         }
                     }
@@ -404,11 +403,8 @@ var Calendar = (function () {
                                             break;
                                         }
                                     }
-                                    this.curMonthFirstDay = null;
-
                                 } else {
                                     this.renderData(Utils.getMonthData(_year, _month), this.monthsLeft[b].days);
-                                    this.getCurMonthFirstDay(this.monthsLeft[b].days);
                                 }
                                 this.months[b].style.top = this.monthsTop[this.weekIndex] + 'px';
                             } else {
@@ -416,6 +412,7 @@ var Calendar = (function () {
                                 this.yearTemp = _lastYear;
                                 this.monthTemp = _lastMonth;
                             }
+                            this.getCurMonthFirstDay(this.monthsLeft[b].days);
                             break;
                         }
                     }
@@ -427,9 +424,7 @@ var Calendar = (function () {
          * 获取当月坐标（0,0）位置的日期
          */
         getCurMonthFirstDay: function (days) {
-            if (!this.curMonthFirstDay) {
-                this.curMonthFirstDay = days[0].innerText;
-            }
+            this.curMonthFirstDay = days[0].innerText;
         },
 
         /**
@@ -525,6 +520,9 @@ var Calendar = (function () {
                 //选择当前默getTitleInfo认日期
                 // this.selectDefaultDay();
 
+                //展开时设置当月第一周为默认当前周（没有选择日期时），收起时设置当前展示的周为默认当前周
+                this.setCurrentWeekAutomatic();
+
                 //在日历收起状态，则需要统一所有日期的显示样式（不区分上月，本月，下月）
                 this.useBlackStyle();
 
@@ -572,6 +570,7 @@ var Calendar = (function () {
         getCurDays: function () {
             for (var i = 0; i < this.monthsLeft.length; i++) {
                 if (this.monthsLeft[i].left === 0) {
+                    this.curMonth = this.months[i];
                     this.curDays = this.monthsLeft[i].days;
                 }
             }
@@ -719,7 +718,7 @@ var Calendar = (function () {
         /**
          * 具体实现展开的函数
          */
-        foldCalendar: function () {
+        unfoldCalendar: function () {
             this.calendarPanel.style.height = this.panelHeight.unfold + 'px';
             this.foldBox.style.backgroundImage = 'url("images/arrow_upward.png")';
             for (var a = 0; a < this.months.length; a++) {
@@ -734,7 +733,7 @@ var Calendar = (function () {
         /**
          * 具体实现收起的函数
          */
-        unfoldCalendar: function () {
+        foldCalendar: function () {
             this.calendarPanel.style.height = this.panelHeight.fold + 'px';
             this.foldBox.style.backgroundImage = 'url("images/arrow_downward.png")';
             for (var c = 0; c < this.months.length; c++) {
@@ -755,9 +754,9 @@ var Calendar = (function () {
             this.startAnimation(this.calendarPanel, 'height', 0.2);
             this.startAnimation(this.months, 'top', 0.2);
             if (this.fold) {
-                this.foldCalendar();
-            } else {
                 this.unfoldCalendar();
+            } else {
+                this.foldCalendar();
             }
 
             this.foldOrUnfoldCallback();
@@ -769,11 +768,11 @@ var Calendar = (function () {
         slideFoldOrUnfold: function () {
             if (this.fold) {
                 if (this.slideDir === 2) {
-                    this.foldCalendar();
+                    this.unfoldCalendar();
                 }
             } else {
                 if (this.slideDir === 1) {
-                    this.unfoldCalendar();
+                    this.foldCalendar();
                 }
             }
             this.foldOrUnfoldCallback();
@@ -869,13 +868,9 @@ var Calendar = (function () {
             for (var x = 0; x < this.days.length; x++) {
                 this.days[x].classList.remove('selected');
             }
-            for (var y = 0; y < this.weeks.length; y++) {
-                this.weeks[y].classList.remove('curWeek');
-            }
             if (this.fold) {
                 _selectedDay = this.curDays[this.weekIndex * 7];
                 _selectedDay.classList.add('selected');
-                _selectedDay.parentNode.classList.add('curWeek');
                 this.curWeek = _selectedDay.parentNode;
                 this.day = this.dayTemp = this.curDays[this.weekIndex * 7].innerText;
 
@@ -900,7 +895,6 @@ var Calendar = (function () {
                     if (this.curDays[b].innerText === this.dayTemp.toString()) {
                         _selectedDay = this.curDays[b];
                         _selectedDay.classList.add('selected');
-                        _selectedDay.parentNode.classList.add('curWeek');
                         this.curWeek = _selectedDay.parentNode;
                         break;
                     }
@@ -923,10 +917,6 @@ var Calendar = (function () {
             e.target.classList.add('selected');
 
             //给当前被选择元素所在的横行添加class
-            for (var j = 0; j < this.weeks.length; j++) {
-                this.weeks[j].classList.remove('curWeek');
-            }
-            _curWeek.classList.add('curWeek');
             this.curWeek = _curWeek;
 
             //更新月份面板在展开收起时的终值
@@ -978,6 +968,13 @@ var Calendar = (function () {
                 this.slideDir = this.getDirection(this.touchStartPos.pageX, this.touchStartPos.pageY, this.touchMovePos.pageX, this.touchMovePos.pageY);
                 this.selectAllowed = false; //禁止在滑动时自动选择日期
                 this.slideDirLock = true; //锁住滑动方向，避免重复执行方向计算
+
+                //避免在计算出滑动方向之前就产生细微位移
+                if (this.fold) {
+                    this.calendarPanel.style.height = this.panelHeight.fold + 'px';
+                } else {
+                    this.calendarPanel.style.height = this.panelHeight.unfold + 'px';
+                }
             }
         },
 
@@ -1043,6 +1040,7 @@ var Calendar = (function () {
          * 在有计划的日期上添加红点标记
          */
         renderRedDot: function (obj, days) {
+            var _redDotArr = null;
 
             //如果参数不满足要求则返回
             if ((!obj || !days) || (obj.length === 0 || days.length === 0)) {
@@ -1050,44 +1048,53 @@ var Calendar = (function () {
             }
 
             //将数组中的年份和月份去除
-            obj = this.dataSimplification(obj);
+            _redDotArr = this.dataSimplification(obj);
 
             //再正式添加之前，先清除之前的红点
             this.removeExisting();
 
             //正式添加红点
-            this.renderAllRedDots(obj, days);
+            this.renderAllRedDots(_redDotArr, days);
         },
 
         /**
          * 渲染所需的红点标记
          */
-        renderAllRedDots: function (obj, days) {
-            var _obj = obj,
-                _days = days;
+        renderAllRedDots: function (arr, days) {
+            var _className = ['last', 'cur', 'next'],
+                _index = 0,
+                _curI = 0;
 
-            for (var i = 0; i < _obj.length; i++) {
-                for (var j = 0; j < _days.length; j++) {
-                    if (_obj[i] === _days[j].innerText && days[j].className.indexOf('cur') !== -1) {
-                        _days[j].classList.add(this.mark);
-                        this.redDotCarrier.push(_days[j]);
-                        break;
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i] !== '0') {
+                    for (var j = _curI; j < days.length; j++) {
+                        if (arr[i] === days[j].innerText && days[j].className.indexOf(_className[_index]) !== -1) {
+                            days[j].classList.add(this.mark);
+                            this.redDotCarrier.push(days[j]);
+                            _curI = j;
+                            break;
+                        }
                     }
+                } else {
+                    _index = _index >= 2 ? 0 : ++_index;
                 }
-
             }
-
         },
 
         /**
          * 修改后台红点数据
          */
         dataSimplification: function (obj) {
-            var _res = [];
-            for (var i = 0; i < obj.length; i++) {
-                _res.push(parseInt(obj[i].split('-').pop()).toString());
+            var _arr = [];
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    for (var i = 0; i < obj[key].length; i++) {
+                        _arr.push(parseInt(obj[key][i].split('-').pop()).toString());
+                    }
+                    _arr.push('0');
+                }
             }
-            return _res;
+            return _arr;
         },
 
         /**
@@ -1114,7 +1121,6 @@ var Calendar = (function () {
             for (var i = 0; i < this.days1.length; i++) {
                 if (parseInt(this.days1[i].innerText) === d && this.days1[i].className.indexOf('cur') !== -1) {
                     this.days1[i].classList.add('selected');
-                    this.days1[i].parentNode.classList.add('curWeek');
                     this.curWeek = this.days1[i].parentNode;
                     this.weekIndex = Math.floor(i / 7);
                     this.weekIndexTemp = this.weekIndex;
@@ -1150,6 +1156,19 @@ var Calendar = (function () {
                     this.curDays[d].classList.remove('selected');
                 }
             }
+        },
+
+        /**
+         * 在滑动时自动选择当前周
+         */
+        setCurrentWeekAutomatic: function () {
+            if (this.fold) {
+                this.curWeek = this.curDays[this.weekIndex * 7].parentNode;
+            } else {
+                this.weekIndex = 0;
+                this.curWeek = this.curMonth.firstElementChild;
+            }
+            this.updateMonthTop();
         },
 
         /**
