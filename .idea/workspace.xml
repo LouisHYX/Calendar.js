@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="be04f9c3-e8fc-4468-a539-8da375f9f47a" name="Default Changelist" comment="" />
+    <list default="true" id="be04f9c3-e8fc-4468-a539-8da375f9f47a" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/css.css" beforeDir="false" afterPath="$PROJECT_DIR$/css.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/js/calendar.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/calendar.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -33,7 +37,7 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
-    <property name="two.files.diff.last.used.file" value="$USER_HOME$/Desktop/Calendar/js/calendar-vue.js" />
+    <property name="two.files.diff.last.used.file" value="$USER_HOME$/Desktop/calendar-vue.js" />
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -86,6 +90,7 @@
       <workItem from="1588079303836" duration="17000" />
       <workItem from="1588079330543" duration="453000" />
       <workItem from="1589962203366" duration="15298000" />
+      <workItem from="1589990281901" duration="353000" />
     </task>
     <servers />
   </component>
@@ -97,12 +102,12 @@
       <screen x="0" y="23" width="2048" height="1062" />
     </state>
     <state x="762" y="308" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.23.2048.1062@0.23.2048.1062" timestamp="1586349041244" />
-    <state x="2" y="52" width="2048" height="1072" maximized="true" key="DiffContextDialog" timestamp="1588079783071">
+    <state x="2" y="52" width="2048" height="1072" maximized="true" key="DiffContextDialog" timestamp="1589990634907">
       <screen x="0" y="23" width="2048" height="1073" />
     </state>
     <state x="-1" y="42" width="2049" height="1072" maximized="true" key="DiffContextDialog/0.23.2048.1071@0.23.2048.1071" timestamp="1587434191003" />
     <state x="100" y="118" width="1848" height="872" key="DiffContextDialog/0.23.2048.1072@0.23.2048.1072" timestamp="1587002412495" />
-    <state x="2" y="52" width="2048" height="1072" maximized="true" key="DiffContextDialog/0.23.2048.1073@0.23.2048.1073" timestamp="1588079783071" />
+    <state x="2" y="52" width="2048" height="1072" maximized="true" key="DiffContextDialog/0.23.2048.1073@0.23.2048.1073" timestamp="1589990634907" />
     <state x="612" y="303" key="IDE.errors.dialog" timestamp="1583547913660">
       <screen x="0" y="23" width="2048" height="1060" />
     </state>

@@ -697,14 +697,16 @@ var Calendar = (function () {
             switch (this.fold) {
                 case true:
                     this.calendarPanel.style.height = this.panelHeight.fold + 'px';
-                    this.foldBox.style.backgroundImage = 'url("images/arrow_downward.png")';
+                    this.foldBox.classList.remove('unfoldImage');
+                    this.foldBox.classList.add('foldImage');
                     for (var i = 0; i < this.months.length; i++) {
                         this.months[i].style.top = this.monthTop.fold + 'px';
                     }
                     break;
                 case false:
                     this.calendarPanel.style.height = this.panelHeight.unfold + 'px';
-                    this.foldBox.style.backgroundImage = 'url("images/arrow_upward.png")';
+                    this.foldBox.classList.remove('foldImage');
+                    this.foldBox.classList.add('unfoldImage');
                     for (var j = 0; j < this.months.length; j++) {
                         this.months[j].style.top = this.monthTop.unfold + 'px';
                     }
@@ -720,7 +722,9 @@ var Calendar = (function () {
          */
         unfoldCalendar: function () {
             this.calendarPanel.style.height = this.panelHeight.unfold + 'px';
-            this.foldBox.style.backgroundImage = 'url("images/arrow_upward.png")';
+            this.foldBox.classList.remove('foldImage');
+            this.foldBox.classList.add('unfoldImage');
+
             for (var a = 0; a < this.months.length; a++) {
                 this.months[a].style.top = this.monthTop.unfold + 'px';
             }
@@ -735,7 +739,8 @@ var Calendar = (function () {
          */
         foldCalendar: function () {
             this.calendarPanel.style.height = this.panelHeight.fold + 'px';
-            this.foldBox.style.backgroundImage = 'url("images/arrow_downward.png")';
+            this.foldBox.classList.remove('unfoldImage');
+            this.foldBox.classList.add('foldImage');
             for (var c = 0; c < this.months.length; c++) {
                 this.months[c].style.top = this.monthTop.fold + 'px';
             }
