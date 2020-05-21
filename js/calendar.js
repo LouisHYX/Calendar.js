@@ -15,6 +15,7 @@ var Calendar = (function () {
                 getRedDotArr: null, //获取红点标记数据的方法
                 afterInit: null, //初始化完成之后的回调
                 afterSelect: null, //点击日期之后的回调
+                afterSlide: null, //日历左右滑动后的回调
                 afterSlideToLast: null, //滑到上个月之后的回调
                 afterSlideToNext: null, //滑到下个月之后的回调
                 afterFold: null, //收起之后的回调
@@ -28,6 +29,7 @@ var Calendar = (function () {
         //红点标记
         this.redDotArrFn = this.options.getRedDotArr instanceof Function ? this.options.getRedDotArr : function () {
         }; //指向后台读取红点标记数组的方法
+        this.redDotObj = null; //保存红点数组
         this.redDotCarrier = []; //保存红点所在的节点
         this.mark = 'mark'; //保存生成红点的class
 
@@ -56,7 +58,7 @@ var Calendar = (function () {
             {
                 event: 'touchend', listener: this.backToToday, handler: function () {
                     this.reset();
-                    if (this.options.afterReset && this.options.afterReset instanceof Function) {
+                    if (this.options.afterReset instanceof Function) {
                         this.options.afterReset(this.getTitleInfo());
                     }
                 }.bind(this)
@@ -179,6 +181,7 @@ var Calendar = (function () {
         this.monthTop = {fold: null, unfold: 0}; //存放月份面板的top值，作为展开收起后月份面板的top终值
         this.getData = true; //是否允许从Utils对象中获取日历数据
         this.afterSlideLock = true; //横滑动画锁
+        this.curTitleInfoTemp = null; //暂存当前日历标题数据
 
         //初始化
         this.init();
@@ -210,9 +213,10 @@ var Calendar = (function () {
         afterInitCallBack: function () {
 
             //添加红点
-            this.renderRedDot(this.redDotArrFn(), this.curDays);
+            this.redDotArrFn(this);
+            this.renderRedDot(this.redDotObj, this.curDays);
 
-            if (this.options.afterInit && this.options.afterInit instanceof Function) {
+            if (this.options.afterInit instanceof Function) {
                 this.options.afterInit.bind(this)();
             }
         },
@@ -468,7 +472,7 @@ var Calendar = (function () {
                 m = 11;
             }
             this.title.setAttribute('data-date', y + '-' + (m + 1) + '-' + d);
-            this.title.innerText = y + '-' + (m + 1);
+            this.title.innerText = y + '年' + (m + 1) + '月';
         },
 
         /**
@@ -517,7 +521,7 @@ var Calendar = (function () {
                 //获取当月日期数据
                 this.getCurDays();
 
-                //选择当前默getTitleInfo认日期
+                //选择当前默认日期
                 // this.selectDefaultDay();
 
                 //展开时设置当月第一周为默认当前周（没有选择日期时），收起时设置当前展示的周为默认当前周
@@ -788,11 +792,11 @@ var Calendar = (function () {
          */
         foldOrUnfoldCallback: function () {
             if (this.fold) {
-                if (this.options.afterFold && this.options.afterFold instanceof Function) {
+                if (this.options.afterFold instanceof Function) {
                     this.options.afterFold.bind(this)(this.getTitleInfo());
                 }
             } else {
-                if (this.options.afterUnfold && this.options.afterUnfold instanceof Function) {
+                if (this.options.afterUnfold instanceof Function) {
                     this.options.afterUnfold.bind(this)(this.getTitleInfo());
                 }
             }
@@ -960,7 +964,7 @@ var Calendar = (function () {
             }
 
             //用户点击日期的回调
-            if (this.options.afterSelect && this.options.afterSelect instanceof Function) {
+            if (this.options.afterSelect instanceof Function) {
                 this.options.afterSelect.bind(this)(this.getTitleInfo());
             }
         },
@@ -1020,22 +1024,24 @@ var Calendar = (function () {
          * 面板左右滑动动画结束之后
          */
         afterSlideHorizontal: function () {
-            var _redDotArr = null;
 
+            //日历滑动(不分左右)之后的回调
+            if (this.options.afterSlide instanceof Function) {
+                this.options.afterSlide(this);
+            }
+            
             //滑到上个月之后的回调
-            if (this.options.afterSlideToLast && this.slideDir === 4 && this.options.afterSlideToLast instanceof Function) {
-                _redDotArr = this.redDotArrFn();
+            if (this.slideDir === 4 && this.options.afterSlideToLast instanceof Function) {
                 this.options.afterSlideToLast.bind(this)();
             }
 
             //滑到下个月之后的回调
-            if (this.options.afterSlideToNext && this.slideDir === 3 && this.options.afterSlideToNext instanceof Function) {
-                _redDotArr = this.redDotArrFn();
+            if (this.slideDir === 3 && this.options.afterSlideToNext instanceof Function) {
                 this.options.afterSlideToNext.bind(this)();
             }
 
             //在日历上渲染红点标记
-            this.renderRedDot(_redDotArr, this.curDays);
+            this.renderRedDot(this.redDotObj, this.curDays);
 
             //重置滑动方向
             this.slideDir = 0;
@@ -1045,7 +1051,7 @@ var Calendar = (function () {
          * 在有计划的日期上添加红点标记
          */
         renderRedDot: function (obj, days) {
-            var _redDotArr = null;
+            var _redDotObj = null;
 
             //如果参数不满足要求则返回
             if ((!obj || !days) || (obj.length === 0 || days.length === 0)) {
@@ -1053,13 +1059,13 @@ var Calendar = (function () {
             }
 
             //将数组中的年份和月份去除
-            _redDotArr = this.dataSimplification(obj);
+            _redDotObj = this.dataSimplification(obj);
 
             //再正式添加之前，先清除之前的红点
             this.removeExisting();
 
             //正式添加红点
-            this.renderAllRedDots(_redDotArr, days);
+            this.renderAllRedDots(_redDotObj, days);
         },
 
         /**
@@ -1169,6 +1175,17 @@ var Calendar = (function () {
         setCurrentWeekAutomatic: function () {
             if (this.fold) {
                 this.curWeek = this.curDays[this.weekIndex * 7].parentNode;
+                this.day = this.dayTemp = this.curDays[this.weekIndex * 7].innerText;
+
+                //如果默认选择为上个月的日期，则当前标题月份显示需要-1
+                if (this.curDays[this.weekIndex * 7].className.indexOf('last') !== -1) {
+                    this.monthTemp--;
+                }
+
+                //如果默认选择为下个月的日期，则当前标题月份显示需要+1
+                if (this.curDays[this.weekIndex * 7].className.indexOf('next') !== -1) {
+                    this.monthTemp++;
+                }
             } else {
                 this.weekIndex = 0;
                 this.curWeek = this.curMonth.firstElementChild;
