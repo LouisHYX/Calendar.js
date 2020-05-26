@@ -169,7 +169,7 @@ var Calendar = (function () {
         this.weekIndex = 0; //设置日历收起时所展示的当月星期在月份面板中的索引
         this.weekIndexTemp = 0; //缓存日历收起时所展示的当月星期索引，若没有真正的滑动面板，则重新将原值赋给weekIndex
         this.curMonthFirstDay = null; //当前月份面板坐标(0, 0)位置的日期
-        this.curMonthLastDay = null; //当前月份面板坐标(6, 5)位置的日期
+        this.curMonthLastDay = null; //当前月份面板坐标(6, 0)位置的日期
         this.fold = true; //日历是否为收起状态
         this.curMonth = null; //存放当月
         this.curWeek = null; //存放当前被选中的日期所在行
@@ -181,7 +181,6 @@ var Calendar = (function () {
         this.monthTop = {fold: null, unfold: 0}; //存放月份面板的top值，作为展开收起后月份面板的top终值
         this.getData = true; //是否允许从Utils对象中获取日历数据
         this.afterSlideLock = true; //横滑动画锁
-        this.curTitleInfoTemp = null; //暂存当前日历标题数据
 
         //初始化
         this.init();
@@ -258,7 +257,7 @@ var Calendar = (function () {
             }
 
             //添加红点
-            this.renderRedDot(this.redDotArrFn(), this.curDays);
+            this.renderRedDot(this.redDotObj, this.curDays);
         },
 
         /**
@@ -363,7 +362,11 @@ var Calendar = (function () {
                     for (var a = 0; a < this.monthsLeft.length; a++) {
                         if (this.monthsLeft[a].left > 0) {
                             if (this.fold) {
-                                this.weekIndex < 5 ? this.weekIndex++ : this.weekIndex = 0;
+                                if (this.curMonthLastDay > 7) {
+                                    this.weekIndex < 5 ? this.weekIndex++ : this.weekIndex = 0;
+                                } else {
+                                    this.weekIndex < 4 ? this.weekIndex++ : this.weekIndex = 0;
+                                }
                                 if (this.weekIndex === 0) {
                                     this.renderData(Utils.getMonthData(_nextYear, _nextMonth), this.monthsLeft[a].days);
                                     this.yearTemp = _nextYear;
@@ -372,8 +375,13 @@ var Calendar = (function () {
                                     //如果在收起状态从这个月滑到下个月，则要排除在下个月中这个月的数据显示
                                     for (var x = 0; x < this.monthsLeft[a].days.length; x++) {
                                         if (this.monthsLeft[a].days[x].innerText === this.curMonthLastDay) {
-                                            this.weekIndex = (Math.floor(x / 7) === 5 ? 1 : Math.floor(x / 7) + 1);
-                                            break;
+                                            if (this.curMonthLastDay > 7) {
+                                                this.weekIndex = (Math.floor(x / 7) === 5 ? 1 : Math.floor(x / 7) + 1);
+                                                break;
+                                            } else {
+                                                this.weekIndex = (Math.floor(x / 7) === 5 ? 1 : Math.floor(x / 7));
+                                                break;
+                                            }
                                         }
                                     }
                                 } else {
@@ -385,7 +393,7 @@ var Calendar = (function () {
                                 this.yearTemp = _nextYear;
                                 this.monthTemp = _nextMonth;
                             }
-                            this.getCurMonthFirstDay(this.monthsLeft[a].days);
+                            this.getCurMonthLastDay(this.monthsLeft[a].days);
                             break;
                         }
                     }
@@ -432,12 +440,10 @@ var Calendar = (function () {
         },
 
         /**
-         * 获取当月坐标（6,5）位置的日期
+         * 获取当月坐标（6,0）位置的日期
          */
         getCurMonthLastDay: function (days) {
-            if (!this.curMonthLastDay) {
-                this.curMonthLastDay = days[days.length - 1].innerText;
-            }
+            this.curMonthLastDay = days[days.length - 7].innerText;
         },
 
         /**
@@ -1029,7 +1035,7 @@ var Calendar = (function () {
             if (this.options.afterSlide instanceof Function) {
                 this.options.afterSlide(this);
             }
-            
+
             //滑到上个月之后的回调
             if (this.slideDir === 4 && this.options.afterSlideToLast instanceof Function) {
                 this.options.afterSlideToLast.bind(this)();
