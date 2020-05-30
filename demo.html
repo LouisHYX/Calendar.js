@@ -47,7 +47,9 @@
                 cur: ['2020-05-01', '2020-05-08', '2020-05-09', '2020-05-10', '2020-05-11', '2020-05-12', '2020-05-13', '2020-05-17', '2020-05-23'],
                 next: ['2020-06-05', '2020-06-06', '2020-06-07', '2020-06-30']
             };
-            return me.redDotObj;
+            me.renderRedDot(me.redDotObj, me.curDays);
+
+            // return me.redDotObj;
         },
         afterInit: function () {
             this.curTitleInfoTemp = this.getTitleInfo();
@@ -58,14 +60,20 @@
         afterSlide: me => {
             var _redDotObj = null;
 
+            console.log(me.redDotObj);
             //从后台获取红点数据
             if(me.fold){
                 if(me.curTitleInfoTemp.month !== me.getTitleInfo().month){
                     _redDotObj = me.redDotArrFn(me);
                     me.curTitleInfoTemp = me.getTitleInfo();
+                    console.log('收起');
+                } else {
+                    _redDotObj = me.renderRedDot(me.redDotObj, me.curDays);
+                    console.log('不调接口');
                 }
             } else {
                 _redDotObj = me.redDotArrFn(me);
+                console.log('展开');
             }
 
             return _redDotObj;

@@ -181,6 +181,7 @@ var Calendar = (function () {
         this.monthTop = {fold: null, unfold: 0}; //存放月份面板的top值，作为展开收起后月份面板的top终值
         this.getData = true; //是否允许从Utils对象中获取日历数据
         this.afterSlideLock = true; //横滑动画锁
+        this.curTitleInfoTemp = null;
 
         //初始化
         this.init();
@@ -213,7 +214,6 @@ var Calendar = (function () {
 
             //添加红点
             this.redDotArrFn(this);
-            this.renderRedDot(this.redDotObj, this.curDays);
 
             if (this.options.afterInit instanceof Function) {
                 this.options.afterInit.bind(this)();
@@ -257,7 +257,10 @@ var Calendar = (function () {
             }
 
             //添加红点
-            this.renderRedDot(this.redDotObj, this.curDays);
+            this.redDotArrFn(this);
+
+            //暂存当前的标题日期
+            this.curTitleInfoTemp = this.getTitleInfo();
         },
 
         /**
@@ -973,6 +976,9 @@ var Calendar = (function () {
             if (this.options.afterSelect instanceof Function) {
                 this.options.afterSelect.bind(this)(this.getTitleInfo());
             }
+
+            //暂存当前的标题日期
+            this.curTitleInfoTemp = this.getTitleInfo();
         },
 
         /**
@@ -1047,7 +1053,7 @@ var Calendar = (function () {
             }
 
             //在日历上渲染红点标记
-            this.renderRedDot(this.redDotObj, this.curDays);
+            this.curTitleInfoTemp = this.getTitleInfo();
 
             //重置滑动方向
             this.slideDir = 0;
@@ -1128,7 +1134,7 @@ var Calendar = (function () {
          * 手动刷新红点
          */
         renderRedDotManually: function () {
-            this.renderRedDot(this.redDotArrFn(), this.curDays);
+            this.redDotArrFn(this);
         },
 
         /**
